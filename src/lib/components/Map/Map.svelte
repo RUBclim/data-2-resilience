@@ -141,15 +141,15 @@
 					setTimeout(() => {
 						const style = map.getStyle();
 						if (style?.layers) {
-							const heatRasterLayers = style.layers.filter(layer => 
+							const heatRasterLayers = style.layers.filter(layer =>
 								layer.id.includes('raster-layer-') && layer.type === 'raster' && !layer.id.includes('satellite')
 							);
 							// Find the first road/transportation layer to position heat raster layers before streets
-							const firstRoadLayer = style.layers.find(layer => 
+							const firstRoadLayer = style.layers.find(layer =>
 								layer['source-layer'] === 'transportation' && layer.type === 'line'
 							);
 							const buildingLayer = style.layers.find(layer => layer.id === 'building');
-							
+
 							if (heatRasterLayers.length > 0 && (firstRoadLayer || buildingLayer)) {
 								const targetLayerId = firstRoadLayer?.id || 'building';
 								heatRasterLayers.forEach(rasterLayer => {
