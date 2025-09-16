@@ -232,7 +232,7 @@
 		<RasterLayer
 			paint={{}}
 			layout={{ visibility: visible && finalConfig.hour === layerHour ? 'visible' : 'none' }}
-			beforeLayerType="symbol"
+			beforeId="building"
 		/>
 	</RasterTileSource>
 {/each}
