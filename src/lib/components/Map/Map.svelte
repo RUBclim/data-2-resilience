@@ -135,6 +135,32 @@
 							} catch (e) {}
 						});
 					}
+
+					// CRITICAL FIX: After style change, ensure heat raster layers are positioned correctly
+					// This handles the race condition between style loading and raster layer re-addition
+					setTimeout(() => {
+						const style = map.getStyle();
+						if (style?.layers) {
+							const heatRasterLayers = style.layers.filter(layer => 
+								layer.id.includes('raster-layer-') && layer.type === 'raster' && !layer.id.includes('satellite')
+							);
+							// Find the first road/transportation layer to position heat raster layers before streets
+							const firstRoadLayer = style.layers.find(layer => 
+								layer['source-layer'] === 'transportation' && layer.type === 'line'
+							);
+							const buildingLayer = style.layers.find(layer => layer.id === 'building');
+							
+							if (heatRasterLayers.length > 0 && (firstRoadLayer || buildingLayer)) {
+								const targetLayerId = firstRoadLayer?.id || 'building';
+								heatRasterLayers.forEach(rasterLayer => {
+									try {
+										// Move heat raster layers before first road layer (or building if no roads)
+										map.moveLayer(rasterLayer.id, targetLayerId);
+									} catch (e) {}
+								});
+							}
+						}
+					}, 100); // Small delay to ensure all layers are added
 				} catch (e) {
 					console.debug('Error applying visibility settings:', e);
 				}

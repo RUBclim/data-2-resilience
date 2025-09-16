@@ -6004,6 +6004,19 @@ function createStyleWithSatellite(baseStyle: StyleSpecification, includeSatellit
 			const backgroundIndex = style.layers.findIndex((layer: any) => layer.id === 'background');
 			style.layers.splice(backgroundIndex + 1, 0, satelliteLayer);
 		}
+
+		// Ensure building visibility in satellite mode
+		style.layers.forEach((layer: any) => {
+			if (layer.id === 'building' && layer.paint) {
+				const fillColor = layer.paint['fill-color'];
+				// Fix transparent buildings in dark mode
+				if (fillColor === 'transparent' || 
+					(typeof fillColor === 'object' && fillColor.stops && 
+					 fillColor.stops.some((stop: any[]) => stop[1] === 'transparent'))) {
+					layer.paint['fill-color'] = '#dfdfdf'; // Consistent light gray
+				}
+			}
+		});
 	}
 
 	return style;
