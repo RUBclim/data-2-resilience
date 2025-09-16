@@ -6005,16 +6005,26 @@ function createStyleWithSatellite(baseStyle: StyleSpecification, includeSatellit
 			style.layers.splice(backgroundIndex + 1, 0, satelliteLayer);
 		}
 
-		// Ensure building visibility in satellite mode
+		// Enhance visibility in satellite mode
 		style.layers.forEach((layer: any) => {
+			// Fix building visibility in dark mode
 			if (layer.id === 'building' && layer.paint) {
 				const fillColor = layer.paint['fill-color'];
-				// Fix transparent buildings in dark mode
 				if (fillColor === 'transparent' || 
 					(typeof fillColor === 'object' && fillColor.stops && 
 					 fillColor.stops.some((stop: any[]) => stop[1] === 'transparent'))) {
 					layer.paint['fill-color'] = '#dfdfdf'; // Consistent light gray
 				}
+			}
+			
+			// Hide redundant overlays since satellite imagery shows natural features
+			if (layer.id === 'water' || layer.id === 'water_shadow' || layer.id === 'waterway' || layer.id === 'waterway_label' ||
+				layer.id === 'landcover' || layer.id === 'landuse' || layer.id === 'landuse_residential' ||
+				layer.id === 'park_national_park' || layer.id === 'park_nature_reserve') {
+				if (!layer.layout) {
+					layer.layout = {};
+				}
+				layer.layout.visibility = 'none';
 			}
 		});
 	}
