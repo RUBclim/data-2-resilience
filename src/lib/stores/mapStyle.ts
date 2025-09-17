@@ -4808,8 +4808,8 @@ export const positronMapStyleNight = {
 				'fill-color': {
 					base: 1,
 					stops: [
-						[15.5, 'transparent'],
-						[16, 'transparent']
+						[15.5, '#393939'],
+						[16, '#393939']
 					]
 				},
 				'fill-antialias': true
@@ -4832,7 +4832,7 @@ export const positronMapStyleNight = {
 					]
 				},
 				'fill-outline-color': '#0e0e0e',
-				'fill-color': 'rgba(57, 57, 57, 1)',
+				'fill-color': '#393939',
 				'fill-opacity': {
 					base: 1,
 					stops: [
@@ -6007,13 +6007,16 @@ function createStyleWithSatellite(baseStyle: StyleSpecification, includeSatellit
 
 		// Enhance visibility in satellite mode
 		style.layers.forEach((layer: any) => {
-			// Fix building visibility in dark mode
+			// Ensure buildings are visible over satellite imagery
 			if (layer.id === 'building' && layer.paint) {
 				const fillColor = layer.paint['fill-color'];
-				if (fillColor === 'transparent' ||
-					(typeof fillColor === 'object' && fillColor.stops &&
-					 fillColor.stops.some((stop: any[]) => stop[1] === 'transparent'))) {
-					layer.paint['fill-color'] = '#dfdfdf'; // Consistent light gray
+				// Only override if the color is too dark for satellite view
+				if (typeof fillColor === 'object' && fillColor.stops) {
+					// Make buildings slightly lighter for better contrast over satellite
+					layer.paint['fill-color'] = '#dfdfdf';
+				} else if (typeof fillColor === 'string' && fillColor.startsWith('#') && fillColor !== '#dfdfdf') {
+					// Make dark colors lighter for satellite view
+					layer.paint['fill-color'] = '#dfdfdf';
 				}
 			}
 
