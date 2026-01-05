@@ -26,6 +26,7 @@
 	import SearchInputField from './SearchInputField.svelte';
 	import SensorCoordinatesWithTooltip from './SensorCoordinatesWithTooltip.svelte';
 	import Table from './Table.svelte';
+	import StationDetailsButton from './StationDetailsButton.svelte';
 
 	let { stations }: { stations: StationMetadata[] } = $props();
 
@@ -99,6 +100,15 @@
 			cell: (info) => {
 				const id = info.row.original.id;
 				return renderComponent(DataDownloadButtonWithTooltip, { id });
+			},
+			enableSorting: false
+		},
+		{
+			header: () => $LL.pages.stations.table.headers.metadata(),
+			accessorKey: 'id',
+			cell: (info) => {
+				const id = info.getValue() as string;
+				return renderComponent(StationDetailsButton, { id });
 			},
 			enableSorting: false
 		}
