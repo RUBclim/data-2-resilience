@@ -657,7 +657,9 @@ const de = {
 					status: 'Status',
 					details: 'Details',
 					dataDownload: 'Daten',
-					dataDownloadTooltip: 'Daten für diese Station herunterladen'
+					dataDownloadTooltip: 'Daten für diese Station herunterladen',
+					metadata: 'Metadaten',
+					metadataTooltip: 'Metadatenblatt für diese Station anzeigen'
 				},
 				cells: {
 					stationTypes: {

@@ -1660,6 +1660,14 @@ type RootTranslation = {
 					 * D​a​t​e​n​ ​f​ü​r​ ​d​i​e​s​e​ ​S​t​a​t​i​o​n​ ​h​e​r​u​n​t​e​r​l​a​d​e​n
 					 */
 					dataDownloadTooltip: string
+					/**
+					 * M​e​t​a​d​a​t​e​n
+					 */
+					metadata: string
+					/**
+					 * M​e​t​a​d​a​t​e​n​b​l​a​t​t​ ​f​ü​r​ ​d​i​e​s​e​ ​S​t​a​t​i​o​n​ ​a​n​z​e​i​g​e​n
+					 */
+					metadataTooltip: string
 				}
 				cells: {
 					stationTypes: {
@@ -1953,6 +1961,34 @@ type RootTranslation = {
 				title: string
 				/**
 				 * D​i​g​i​t​a​l​e​ ​O​r​t​h​o​f​o​t​o​s​ ​s​i​n​d​ ​e​n​t​z​e​r​r​t​e​ ​L​u​f​t​b​i​l​d​e​r​,​ ​d​i​e​ ​w​i​e​ ​e​i​n​e​ ​m​a​ß​s​t​a​b​s​g​e​t​r​e​u​e​ ​K​a​r​t​e​ ​f​u​n​k​t​i​o​n​i​e​r​e​n​.​ ​S​i​e​ ​z​e​i​g​e​n​ ​D​o​r​t​m​u​n​d​ ​a​u​s​ ​d​e​r​ ​V​o​g​e​l​p​e​r​s​p​e​k​t​i​v​e​ ​u​n​d​ ​e​r​m​ö​g​l​i​c​h​e​n​ ​e​i​n​e​ ​r​e​a​l​i​t​ä​t​s​n​a​h​e​ ​O​r​i​e​n​t​i​e​r​u​n​g​.
+				 */
+				description: string
+			}
+			/**
+			 * G​e​b​ä​u​d​e
+			 */
+			buildings: string
+			buildingsTooltip: {
+				/**
+				 * G​e​b​ä​u​d​e​g​r​u​n​d​r​i​s​s​e
+				 */
+				title: string
+				/**
+				 * G​e​b​ä​u​d​e​g​r​u​n​d​r​i​s​s​e​ ​a​u​f​ ​d​e​r​ ​K​a​r​t​e​ ​e​i​n​-​ ​o​d​e​r​ ​a​u​s​b​l​e​n​d​e​n​.
+				 */
+				description: string
+			}
+			/**
+			 * S​t​r​a​ß​e​n
+			 */
+			streets: string
+			streetsTooltip: {
+				/**
+				 * S​t​r​a​ß​e​n​n​e​t​z
+				 */
+				title: string
+				/**
+				 * S​i​c​h​t​b​a​r​k​e​i​t​ ​v​o​n​ ​S​t​r​a​ß​e​n​ ​u​n​d​ ​S​t​r​a​ß​e​n​n​a​m​e​n​ ​e​i​n​-​ ​o​d​e​r​ ​a​u​s​b​l​e​n​d​e​n​.
 				 */
 				description: string
 			}
@@ -3895,6 +3931,14 @@ export type TranslationFunctions = {
 					 * Daten für diese Station herunterladen
 					 */
 					dataDownloadTooltip: () => LocalizedString
+					/**
+					 * Metadaten
+					 */
+					metadata: () => LocalizedString
+					/**
+					 * Metadatenblatt für diese Station anzeigen
+					 */
+					metadataTooltip: () => LocalizedString
 				}
 				cells: {
 					stationTypes: {
@@ -4188,6 +4232,34 @@ export type TranslationFunctions = {
 				title: () => LocalizedString
 				/**
 				 * Digitale Orthofotos sind entzerrte Luftbilder, die wie eine maßstabsgetreue Karte funktionieren. Sie zeigen Dortmund aus der Vogelperspektive und ermöglichen eine realitätsnahe Orientierung.
+				 */
+				description: () => LocalizedString
+			}
+			/**
+			 * Gebäude
+			 */
+			buildings: () => LocalizedString
+			buildingsTooltip: {
+				/**
+				 * Gebäudegrundrisse
+				 */
+				title: () => LocalizedString
+				/**
+				 * Gebäudegrundrisse auf der Karte ein- oder ausblenden.
+				 */
+				description: () => LocalizedString
+			}
+			/**
+			 * Straßen
+			 */
+			streets: () => LocalizedString
+			streetsTooltip: {
+				/**
+				 * Straßennetz
+				 */
+				title: () => LocalizedString
+				/**
+				 * Sichtbarkeit von Straßen und Straßennamen ein- oder ausblenden.
 				 */
 				description: () => LocalizedString
 			}
