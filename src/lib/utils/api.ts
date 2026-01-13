@@ -171,7 +171,7 @@ export const api = (customFetch = fetch) => ({
 		if (datasets.length === 0) {
 			throw new Error(`No datasets found for ${unit}`);
 		}
-		return datasets;
+		return datasets[0];
 	}
 });
 
