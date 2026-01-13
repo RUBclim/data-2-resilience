@@ -10,7 +10,7 @@
 		PopoverTooltipTrigger
 	} from '$lib/components/ui/popover-tooltip';
 	import type { StationsGeoJSONType } from '$lib/stores/mapData';
-	import { heatStressUnit, hour, isLeftSidebarOpened, unit } from '$lib/stores/uiStore';
+	import { dayValue, heatStressUnit, hour, isLeftSidebarOpened, unit } from '$lib/stores/uiStore';
 	import { cn } from '$lib/utils';
 	import { api } from '$lib/utils/api';
 	import { getColorsByUnit, getColorStops, unitsToScalesMap } from '$lib/utils/colorScaleUtil';
@@ -109,6 +109,16 @@
 		}))
 	);
 	const finalLocalDate = $derived.by(() => {
+		// When timeslider is enabled, use the timeslider values
+		if (showTimeslider) {
+			const sliderDate = addDays(today(), $dayValue);
+			// $hour is in LOCAL time, set it as local hour
+			const localDate = setHours(sliderDate, $hour);
+			// Return the date as-is - it represents the local time which will be interpreted as UTC by the API
+			return localDate;
+		}
+
+		// When timeslider is disabled, use API data
 		const config = {
 			doy: $lastAvailableRasterLayerQuery.data?.doy ?? getDayOfYear(today()),
 			hour:
@@ -162,7 +172,7 @@
 					metadata
 				};
 			},
-			enabled: isHeatStressPage && $lastAvailableRasterLayerQuery.isSuccess,
+			enabled: isHeatStressPage && (showTimeslider || $lastAvailableRasterLayerQuery.isSuccess),
 			staleTime: Infinity,
 			cacheTime: Infinity
 		}))
