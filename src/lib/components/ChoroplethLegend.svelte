@@ -119,7 +119,7 @@
 		};
 		const yearStart = startOfYear(setYear(today(), config.year));
 		const startOfDay = addDays(yearStart, config.doy - 1);
-		const tzOffsetInHours = today().getTimezoneOffset() / 60;
+		const tzOffsetInHours = startOfDay.getTimezoneOffset() / 60;
 		const date = addHours(setHours(startOfDay, config.hour), -tzOffsetInHours);
 		return date;
 	});
@@ -162,7 +162,7 @@
 					metadata
 				};
 			},
-			enabled: isHeatStressPage,
+			enabled: isHeatStressPage && $lastAvailableRasterLayerQuery.isSuccess,
 			staleTime: Infinity,
 			cacheTime: Infinity
 		}))

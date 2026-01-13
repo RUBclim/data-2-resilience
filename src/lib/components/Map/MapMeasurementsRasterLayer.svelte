@@ -90,6 +90,9 @@
 		}))
 	);
 
+	// Track configs per param to prevent cross-contamination when switching
+	let configCache = $state<Map<string, { doy: number; hour: number; param: string; year: number }>>(new Map());
+
 	const finalConfig = $derived.by(() => {
 		if (showTimeslider) {
 			return {
@@ -99,17 +102,48 @@
 				year: utcYear
 			};
 		}
-		return {
-			doy: $lastAvailableRasterLayerQuery.data?.doy ?? doy,
-			hour: $lastAvailableRasterLayerQuery.data?.hour ?? utcHour,
-			param: ($lastAvailableRasterLayerQuery.data?.param ?? param).toUpperCase(),
-			year: $lastAvailableRasterLayerQuery.data?.year ?? utcYear
-		};
+
+		const currentParam = param.toUpperCase();
+
+		// If we have data, cache it for this param
+		if ($lastAvailableRasterLayerQuery.data) {
+			const config = {
+				doy: $lastAvailableRasterLayerQuery.data.doy,
+				hour: $lastAvailableRasterLayerQuery.data.hour,
+				param: $lastAvailableRasterLayerQuery.data.param.toUpperCase(),
+				year: $lastAvailableRasterLayerQuery.data.year
+			};
+			configCache.set(currentParam, config);
+			return config;
+		}
+
+		// If loading and we have cached data for this param, use it
+		if (configCache.has(currentParam)) {
+			return configCache.get(currentParam)!;
+		}
+
+		// Return null if we don't have data yet - don't fallback to current date
+		return null;
 	});
 
-	const tilesUrls = $derived(
-		hours.map((h) => {
-			const { doy, param, year } = finalConfig;
+	// Cache tilesUrls per param to prevent old sources from seeing new param's URLs
+	let tilesUrlsCache = $state<Map<string, Array<{ layerHour: number; tilesUrl: string }>>>(new Map());
+
+	const tilesUrls = $derived.by(() => {
+		// If no config yet, return empty array
+		if (!finalConfig) return [];
+
+		const { doy, param, year, hour } = finalConfig;
+		const cacheKey = `${param}-${year}-${doy}-${hour}`;
+
+		// Return cached URLs if they exist for this exact config
+		if (tilesUrlsCache.has(cacheKey)) {
+			return tilesUrlsCache.get(cacheKey)!;
+		}
+
+		// Generate new URLs for this param - only for the specific hour when not using timeslider
+		const hoursToGenerate = showTimeslider ? hours : [hour];
+		const urls = hoursToGenerate.map((h) => {
 			const paddedHour = `${h}`.padStart(2, '0');
 			const paddedDayOfYear = `${doy}`.padStart(3, '0');
 			let colormap = 'turbo';
@@ -146,8 +180,12 @@
 				layerHour: h,
 				tilesUrl: url
 			};
-		})
-	);
+		});
+
+		// Cache and return
+		tilesUrlsCache.set(cacheKey, urls);
+		return urls;
+	});
 
 	const originalFetch = fetch;
 	onMount(() => {
@@ -182,6 +220,7 @@
 	});
 
 	const tilesErrorsForThisTimeAndUnit = $derived.by(() => {
+		if (!finalConfig) return [];
 		const { doy, param, hour, year } = finalConfig;
 		const unitTilesErrors = tilesErrors.get(param);
 		if (!unitTilesErrors || unitTilesErrors.size === 0) return [];
