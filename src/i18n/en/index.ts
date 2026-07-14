@@ -814,7 +814,7 @@ const en = {
 		choroplethLegend: {
 			showHealthRisks: 'Show health risks',
 			hideHealthRisks: 'Hide health risks',
-			title: 'Heath risks',
+			title: 'Health risks',
 			notCollectingData: 'Does not collect data',
 			noValueAvailable: 'No data available',
 			withData: 'Data available',
