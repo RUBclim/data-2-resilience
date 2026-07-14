@@ -2038,7 +2038,7 @@ type RootTranslation = {
 				'extreme cold stress': {
 					title: {
 						/**
-						 * E​x​t​r​e​m​ ​K​a​l​t
+						 * E​x​t​r​e​m​e​r​ ​K​ä​l​t​e​s​t​r​e​s​s
 						 */
 						thermalComfort: string
 						/**
@@ -2061,7 +2061,7 @@ type RootTranslation = {
 				'very strong cold stress': {
 					title: {
 						/**
-						 * S​e​h​r​ ​k​a​l​t
+						 * S​e​h​r​ ​s​t​a​r​k​e​r​ ​K​ä​l​t​e​s​t​r​e​s​s
 						 */
 						thermalComfort: string
 						/**
@@ -2087,7 +2087,7 @@ type RootTranslation = {
 				'strong cold stress': {
 					title: {
 						/**
-						 * K​a​l​t
+						 * S​t​a​r​k​e​r​ ​K​ä​l​t​e​s​t​r​e​s​s
 						 */
 						thermalComfort: string
 						/**
@@ -2113,7 +2113,7 @@ type RootTranslation = {
 				'moderate cold stress': {
 					title: {
 						/**
-						 * K​ü​h​l
+						 * M​o​d​e​r​a​t​e​r​ ​K​ä​l​t​e​s​t​r​e​s​s
 						 */
 						thermalComfort: string
 						/**
@@ -2139,7 +2139,7 @@ type RootTranslation = {
 				'slight cold stress': {
 					title: {
 						/**
-						 * L​e​i​c​h​t​ ​k​ü​h​l
+						 * L​e​i​c​h​t​e​r​ ​K​ä​l​t​e​s​t​r​e​s​s
 						 */
 						thermalComfort: string
 						/**
@@ -2165,7 +2165,7 @@ type RootTranslation = {
 				'no thermal stress': {
 					title: {
 						/**
-						 * N​e​u​t​r​a​l
+						 * K​e​i​n​ ​t​h​e​r​m​.​ ​S​t​r​e​s​s
 						 */
 						thermalComfort: string
 						/**
@@ -2191,7 +2191,7 @@ type RootTranslation = {
 				'moderate heat stress': {
 					title: {
 						/**
-						 * L​e​i​c​h​t​ ​w​a​r​m
+						 * M​o​d​e​r​a​t​e​r​ ​H​i​t​z​e​s​t​r​e​s​s
 						 */
 						thermalComfort: string
 						/**
@@ -2217,7 +2217,7 @@ type RootTranslation = {
 				'strong heat stress': {
 					title: {
 						/**
-						 * W​a​r​m
+						 * S​t​a​r​k​e​r​ ​H​i​t​z​e​s​t​r​e​s​s
 						 */
 						thermalComfort: string
 						/**
@@ -2243,7 +2243,7 @@ type RootTranslation = {
 				'very strong heat stress': {
 					title: {
 						/**
-						 * H​e​i​ß
+						 * S​e​h​r​ ​s​t​a​r​k​e​r​ ​H​i​t​z​e​s​t​r​e​s​s
 						 */
 						thermalComfort: string
 						/**
@@ -2269,7 +2269,7 @@ type RootTranslation = {
 				'extreme heat stress': {
 					title: {
 						/**
-						 * S​e​h​r​ ​h​e​i​ß
+						 * E​x​t​r​e​m​e​r​ ​H​i​t​z​e​s​t​r​e​s​s
 						 */
 						thermalComfort: string
 						/**
@@ -4309,7 +4309,7 @@ export type TranslationFunctions = {
 				'extreme cold stress': {
 					title: {
 						/**
-						 * Extrem Kalt
+						 * Extremer Kältestress
 						 */
 						thermalComfort: () => LocalizedString
 						/**
@@ -4332,7 +4332,7 @@ export type TranslationFunctions = {
 				'very strong cold stress': {
 					title: {
 						/**
-						 * Sehr kalt
+						 * Sehr starker Kältestress
 						 */
 						thermalComfort: () => LocalizedString
 						/**
@@ -4358,7 +4358,7 @@ export type TranslationFunctions = {
 				'strong cold stress': {
 					title: {
 						/**
-						 * Kalt
+						 * Starker Kältestress
 						 */
 						thermalComfort: () => LocalizedString
 						/**
@@ -4384,7 +4384,7 @@ export type TranslationFunctions = {
 				'moderate cold stress': {
 					title: {
 						/**
-						 * Kühl
+						 * Moderater Kältestress
 						 */
 						thermalComfort: () => LocalizedString
 						/**
@@ -4410,7 +4410,7 @@ export type TranslationFunctions = {
 				'slight cold stress': {
 					title: {
 						/**
-						 * Leicht kühl
+						 * Leichter Kältestress
 						 */
 						thermalComfort: () => LocalizedString
 						/**
@@ -4436,7 +4436,7 @@ export type TranslationFunctions = {
 				'no thermal stress': {
 					title: {
 						/**
-						 * Neutral
+						 * Kein therm. Stress
 						 */
 						thermalComfort: () => LocalizedString
 						/**
@@ -4462,7 +4462,7 @@ export type TranslationFunctions = {
 				'moderate heat stress': {
 					title: {
 						/**
-						 * Leicht warm
+						 * Moderater Hitzestress
 						 */
 						thermalComfort: () => LocalizedString
 						/**
@@ -4488,7 +4488,7 @@ export type TranslationFunctions = {
 				'strong heat stress': {
 					title: {
 						/**
-						 * Warm
+						 * Starker Hitzestress
 						 */
 						thermalComfort: () => LocalizedString
 						/**
@@ -4514,7 +4514,7 @@ export type TranslationFunctions = {
 				'very strong heat stress': {
 					title: {
 						/**
-						 * Heiß
+						 * Sehr starker Hitzestress
 						 */
 						thermalComfort: () => LocalizedString
 						/**
@@ -4540,7 +4540,7 @@ export type TranslationFunctions = {
 				'extreme heat stress': {
 					title: {
 						/**
-						 * Sehr heiß
+						 * Extremer Hitzestress
 						 */
 						thermalComfort: () => LocalizedString
 						/**

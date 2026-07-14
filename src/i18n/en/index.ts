@@ -821,7 +821,7 @@ const en = {
 			healthRisks: {
 				'extreme cold stress': {
 					title: {
-						thermalComfort: 'Extremely cold',
+						thermalComfort: 'Extreme cold stress',
 						heatStress: 'Extreme cold stress'
 					},
 					description: 'Life-threatening hypothermia, severe frostbite possible within minutes.',
@@ -832,7 +832,7 @@ const en = {
 				},
 				'very strong cold stress': {
 					title: {
-						thermalComfort: 'Very cold',
+						thermalComfort: 'Very strong cold stress',
 						heatStress: 'Very strong cold stress'
 					},
 					description: 'High risk of frostbite, possible hypothermia.',
@@ -843,7 +843,7 @@ const en = {
 				},
 				'strong cold stress': {
 					title: {
-						thermalComfort: 'Cold',
+						thermalComfort: 'Strong cold stress',
 						heatStress: 'Strong cold stress'
 					},
 					description:
@@ -855,7 +855,7 @@ const en = {
 				},
 				'moderate cold stress': {
 					title: {
-						thermalComfort: 'Cool',
+						thermalComfort: 'Moderate cold stress',
 						heatStress: 'Moderate cold stress'
 					},
 					description: 'Shivering, discomfort, risk of frostbite with prolonged exposure.',
@@ -866,7 +866,7 @@ const en = {
 				},
 				'slight cold stress': {
 					title: {
-						thermalComfort: 'Slightly cool',
+						thermalComfort: 'Slight cold stress',
 						heatStress: 'Slight cold stress'
 					},
 					description: 'Minor discomfort, temporary shivering.',
@@ -877,7 +877,7 @@ const en = {
 				},
 				'no thermal stress': {
 					title: {
-						thermalComfort: 'Neutral',
+						thermalComfort: 'No thermal stress',
 						heatStress: 'No thermal stress'
 					},
 					description: 'Thermal comfort, no significant health risks.',
@@ -888,7 +888,7 @@ const en = {
 				},
 				'moderate heat stress': {
 					title: {
-						thermalComfort: 'Slightly warm',
+						thermalComfort: 'Moderate heat stress',
 						heatStress: 'Moderate heat stress'
 					},
 					description: 'Minor discomfort, increased sweating.',
@@ -899,7 +899,7 @@ const en = {
 				},
 				'strong heat stress': {
 					title: {
-						thermalComfort: 'Warm',
+						thermalComfort: 'Strong heat stress',
 						heatStress: 'Strong heat stress'
 					},
 					description:
@@ -911,7 +911,7 @@ const en = {
 				},
 				'very strong heat stress': {
 					title: {
-						thermalComfort: 'Hot',
+						thermalComfort: 'Very strong heat stress',
 						heatStress: 'Very strong heat stress'
 					},
 					description:
@@ -923,7 +923,7 @@ const en = {
 				},
 				'extreme heat stress': {
 					title: {
-						thermalComfort: 'Very hot',
+						thermalComfort: 'Extreme heat stress',
 						heatStress: 'Extreme heat stress'
 					},
 					description:
