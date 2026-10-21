@@ -151,7 +151,7 @@
 				let colormap = await api().getHeatStressColormap({
 					rangeStart: metadata?.range[0] || 0,
 					rangeEnd: metadata?.range[1] || 100,
-					cmap: cmap,
+					cmap: cmap
 				});
 				if (!colormap)
 					return {

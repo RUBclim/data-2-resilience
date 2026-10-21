@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 /*
 TILES:
 ––––––––––––––––––––––
@@ -87,5 +85,3 @@ REST API ENDPOINTS:
 
 
 */
-
-const UTCIOutputSchema = z.object({});

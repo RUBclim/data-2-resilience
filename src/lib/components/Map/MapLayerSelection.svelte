@@ -124,19 +124,18 @@
 		</DropdownMenu.Item>
 
 		<!-- In the template, add this after the Buildings checkbox -->
-<DropdownMenu.Item
-  on:click={() => updateShowStreets(!$showStreets)}
-  class={cn('grid grid-cols-[auto_1fr_auto] items-center gap-2')}
->
-  <CheckboxIcon checked={$showStreets} />
-  <span class={cn($showStreets && 'font-semibold', 'leading-tight')}>
-    {@html $LL.map.layersSelection.streets()}
-  </span>
-  <InfoTooltip
-    title={$LL.map.layersSelection.streetsTooltip.title()}
-    description={$LL.map.layersSelection.streetsTooltip.description()}
-  />
-</DropdownMenu.Item>
-
+		<DropdownMenu.Item
+			on:click={() => updateShowStreets(!$showStreets)}
+			class={cn('grid grid-cols-[auto_1fr_auto] items-center gap-2')}
+		>
+			<CheckboxIcon checked={$showStreets} />
+			<span class={cn($showStreets && 'font-semibold', 'leading-tight')}>
+				{@html $LL.map.layersSelection.streets()}
+			</span>
+			<InfoTooltip
+				title={$LL.map.layersSelection.streetsTooltip.title()}
+				description={$LL.map.layersSelection.streetsTooltip.description()}
+			/>
+		</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

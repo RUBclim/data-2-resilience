@@ -90,7 +90,7 @@
 
 	let formatter = $derived((value: number) => {
 		if (Number.isNaN(value)) return '';
-		const date = addDays(today(), value === -0 ? 0 : value);
+		const date = addDays(today(), Object.is(value, -0) ? 0 : value);
 		if (isToday(date)) return $LL.pages.measurements.dateRangeSlider.today();
 		return new Intl.DateTimeFormat($locale, {
 			day: 'numeric',

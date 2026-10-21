@@ -13,11 +13,11 @@
 		title,
 		message,
 		links = [
-		{
-			href: `/${$locale}`,
-			text: $LL.errors.fourOhFour.homepageLinkText()
-		}
-	]
+			{
+				href: `/${$locale}`,
+				text: $LL.errors.fourOhFour.homepageLinkText()
+			}
+		]
 	}: Props = $props();
 </script>
 

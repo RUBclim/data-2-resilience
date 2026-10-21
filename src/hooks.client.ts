@@ -25,7 +25,7 @@ Sentry.init({
 		replayIntegration({ useCompression: false, maskAllText: false, blockAllMedia: false })
 	],
 	// tunnel the errors so we avoid ad blockers
-	tunnel: '/sentry-tunnel',
+	tunnel: '/sentry-tunnel'
 });
 
 // If you have a custom error handler, pass it to `handleErrorWithSentry`

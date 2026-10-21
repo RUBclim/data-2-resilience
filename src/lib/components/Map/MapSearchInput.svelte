@@ -61,8 +61,7 @@
 			queryFn: async ({
 				queryKey: [_, searchTerm, wasInputed]
 			}: QueryFunctionContext<QueryKey>) => {
-				if (typeof searchTerm === undefined || !wasInputed) return [];
-				if (!searchTerm) return [];
+				if (!searchTerm || !wasInputed) return [];
 				const query = encodeURIComponent(`${searchTerm}`.trim());
 				const response = await fetch(`${PUBLIC_GEOCODING_URL}?query=${query}&outputformat=JSON`);
 

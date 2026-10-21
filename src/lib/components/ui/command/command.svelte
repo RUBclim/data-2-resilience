@@ -1,24 +1,27 @@
 <script lang="ts">
-	import { Command as CommandPrimitive } from "cmdk-sv";
-	import { cn } from "$lib/utils.js";
+	import { Command as CommandPrimitive } from 'cmdk-sv';
+	import { cn } from '$lib/utils.js';
 
 	type $$Props = CommandPrimitive.CommandProps;
 
-
 	interface Props {
-		value?: $$Props["value"];
+		value?: $$Props['value'];
 		class?: string | undefined | null;
 		children?: import('svelte').Snippet;
-		[key: string]: any
+		[key: string]: any;
 	}
 
-	let { value = $bindable(undefined), class: className = undefined, children, ...rest }: Props = $props();
-
+	let {
+		value = $bindable(undefined),
+		class: className = undefined,
+		children,
+		...rest
+	}: Props = $props();
 </script>
 
 <CommandPrimitive.Root
 	class={cn(
-		"bg-popover text-popover-foreground flex h-full w-full flex-col overflow-hidden rounded-md",
+		'flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground',
 		className
 	)}
 	bind:value

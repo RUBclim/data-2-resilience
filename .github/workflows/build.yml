@@ -13,35 +13,34 @@ jobs:
       matrix:
         node-version: [22]
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: 10
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # the version comes from `packageManager` in package.json
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'pnpm'
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
 
-    - name: Install dependencies
-      run: pnpm install
+      - name: Install dependencies
+        run: pnpm install
 
-    - name: Build
-      run: pnpm build
+      - name: Build
+        run: pnpm build
 
-    - name: Make sentry release
-      if: success() && github.event_name == 'release'
-      uses: getsentry/action-release@v3
-      env:
-        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-        SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-        SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-      with:
-        environment: production
-        ignore_missing: true
-        sourcemaps: "./.svelte-kit/output"
-        release: ${{ github.event.release.tag_name }}
+      - name: Make sentry release
+        if: success() && github.event_name == 'release'
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: production
+          ignore_missing: true
+          sourcemaps: './.svelte-kit/output'
+          release: ${{ github.event.release.tag_name }}

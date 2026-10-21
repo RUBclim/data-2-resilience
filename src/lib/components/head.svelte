@@ -4,8 +4,7 @@
 	import { replaceLocaleInUrl } from '../../utils';
 	import HeadHrefLangs from './HeadHrefLangs.svelte';
 	import { page } from '$app/state';
-
-	const baseUrl = import.meta.env.VITE_BASE_URL || 'http://localhost:5173';
+	import { PUBLIC_VITE_BASE_URL as baseUrl } from '$env/static/public';
 </script>
 
 <svelte:head>

@@ -11,19 +11,18 @@
 		transition?: $$Props['transition'];
 		transitionConfig?: $$Props['transitionConfig'];
 		children?: import('svelte').Snippet;
-		[key: string]: any
+		[key: string]: any;
 	}
 
 	let {
 		class: className = undefined,
 		transition = flyAndScale,
 		transitionConfig = {
-		duration: 200
-	},
+			duration: 200
+		},
 		children,
 		...rest
 	}: Props = $props();
-
 </script>
 
 <Dialog.Portal>
