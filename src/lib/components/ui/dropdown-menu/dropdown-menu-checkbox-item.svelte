@@ -10,11 +10,15 @@
 		class?: $$Props['class'];
 		checked?: $$Props['checked'];
 		children?: import('svelte').Snippet;
-		[key: string]: any
+		[key: string]: any;
 	}
 
-	let { class: className = undefined, checked = $bindable(undefined), children, ...rest }: Props = $props();
-
+	let {
+		class: className = undefined,
+		checked = $bindable(undefined),
+		children,
+		...rest
+	}: Props = $props();
 </script>
 
 <DropdownMenuPrimitive.CheckboxItem

@@ -796,8 +796,7 @@ const de = {
 			buildings: 'Gebäude',
 			buildingsTooltip: {
 				title: 'Gebäudegrundrisse',
-				description:
-					'Gebäudegrundrisse auf der Karte ein- oder ausblenden.'
+				description: 'Gebäudegrundrisse auf der Karte ein- oder ausblenden.'
 			},
 			streets: 'Straßen',
 			streetsTooltip: {

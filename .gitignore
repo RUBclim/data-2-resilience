@@ -1,4 +1,5 @@
 node_modules
+.pnpm-store
 
 # Output
 .output
@@ -16,6 +17,7 @@ Thumbs.db
 !.env.local
 !.env.production
 !.env.preview
+!.env.test
 
 # Vite
 vite.config.js.timestamp-*
@@ -26,3 +28,11 @@ vite.config.ts.timestamp-*
 # Sentry Config File
 .env.sentry-build-plugin
 bin/
+
+# Tests
+/coverage
+/test-results
+/playwright-report
+/blob-report
+/.vitest
+/.pnpm-store

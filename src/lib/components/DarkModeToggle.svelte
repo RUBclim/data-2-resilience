@@ -9,9 +9,9 @@
 </script>
 
 <DropdownMenu.Root>
-	<DropdownMenu.Trigger asChild  aria-label="Light/Dark Theme Switcher">
+	<DropdownMenu.Trigger asChild aria-label="Light/Dark Theme Switcher">
 		{#snippet children({ builder })}
-				<Button builders={[builder]} variant="outline" size="icon">
+			<Button builders={[builder]} variant="outline" size="icon">
 				<Sun
 					class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
 				/>
@@ -20,8 +20,8 @@
 				/>
 				<span class="sr-only">Toggle theme</span>
 			</Button>
-					{/snippet}
-		</DropdownMenu.Trigger>
+		{/snippet}
+	</DropdownMenu.Trigger>
 	<DropdownMenu.Content align="end">
 		<DropdownMenu.Item on:click={() => setMode('light')} class="flex items-center gap-2">
 			<Sun class="size-5" />

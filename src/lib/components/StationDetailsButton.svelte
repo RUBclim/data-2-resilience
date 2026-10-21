@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { LL } from '$i18n/i18n-svelte';
+	import { LL } from '$i18n/i18n-svelte';
 	import { ExternalLink } from 'lucide-svelte';
 	import Button from './ui/button/button.svelte';
 	import { PUBLIC_API_BASE_URL } from '$env/static/public';
@@ -23,12 +23,7 @@
 
 <PopoverTooltip openDelay={10} disableHoverableContent>
 	<PopoverTooltipTrigger tabindex={-1}>
-		<Button
-			variant="ghost"
-			size="icon"
-			class="p-0"
-            onclick={openDetails}
-		>
+		<Button variant="ghost" size="icon" class="p-0" onclick={openDetails}>
 			<ExternalLink class="size-5 shrink-0 text-muted-foreground" />
 		</Button>
 	</PopoverTooltipTrigger>

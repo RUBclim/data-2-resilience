@@ -2,20 +2,14 @@
 	import { LL, locale } from '$i18n/i18n-svelte';
 	import type { StationsGeoJSONType } from '$lib/stores/mapData';
 	import { toggleStationSelection, useStations } from '$lib/stores/stationsStore';
-	import {
-		unit,
-		unitLabel,
-		unitOnly,
-		unitWithMinMaxAvg,
-		unitWithoutCategory
-	} from '$lib/stores/uiStore';
+	import { unit, unitLabel, unitOnly, unitWithMinMaxAvg } from '$lib/stores/uiStore';
 	import { getColorScaleValue } from '$lib/utils/colorScaleUtil';
 	import { reactiveQueryArgs } from '$lib/utils/queryUtils.svelte';
 	import { useStationsSnapshotConfig } from '$lib/utils/useStationsSnapshot';
 	import { createQuery } from '@tanstack/svelte-query';
 	import HealthRiskPill from 'components/HealthRiskPill.svelte';
 	import { mode } from 'mode-watcher';
-	import { GeoJSON, CircleLayer, Popup, hoverStateFilter } from 'svelte-maplibre';
+	import { GeoJSON, CircleLayer, Popup } from 'svelte-maplibre';
 	import { TinyColor } from '@ctrl/tinycolor';
 
 	interface Props {
@@ -24,7 +18,7 @@
 		map: maplibregl.Map;
 	}
 
-	let { stations, initialStationIds = [], map }: Props = $props();
+	let { stations, initialStationIds = [] }: Props = $props();
 
 	const selectedStations = useStations({ initialStationIds, stations });
 	const stationsSnapshotQueryConfig = $derived.by(() =>

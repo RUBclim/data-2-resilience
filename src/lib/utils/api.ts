@@ -77,22 +77,24 @@ export const api = (customFetch = fetch) => ({
 			json,
 			z.object({
 				data: z.array(schema),
-				visualization: z.object({
-					[params.param]: z
-						.object({
-							cmax: z.number().nullable(),
-							cmin: z.number().nullable(),
-							vmax: z.number().nullable(),
-							vmin: z.number().nullable()
-						})
-						.nullable()
-						.default({
-							cmax: null,
-							cmin: null,
-							vmax: null,
-							vmin: null
-						})
-				}).nullable()
+				visualization: z
+					.object({
+						[params.param]: z
+							.object({
+								cmax: z.number().nullable(),
+								cmin: z.number().nullable(),
+								vmax: z.number().nullable(),
+								vmin: z.number().nullable()
+							})
+							.nullable()
+							.default({
+								cmax: null,
+								cmin: null,
+								vmax: null,
+								vmin: null
+							})
+					})
+					.nullable()
 			})
 		);
 		return {
@@ -166,7 +168,7 @@ export const api = (customFetch = fetch) => ({
 		}
 
 		const json = await parseData(response, z.object({ datasets: z.array(RasterLayerInfoSchema) }));
-		let datasets: RasterLayerInfo[] = json.datasets || [];
+		const datasets: RasterLayerInfo[] = json.datasets || [];
 
 		if (datasets.length === 0) {
 			throw new Error(`No datasets found for ${unit}`);

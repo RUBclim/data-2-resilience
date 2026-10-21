@@ -19,7 +19,7 @@
 	import { api } from '$lib/utils/api';
 	import { reactiveQueryArgs } from '$lib/utils/queryUtils.svelte';
 	import type { StationMetadata } from '$lib/utils/schemas';
-	import { compareItems, rankItem } from '@tanstack/match-sorter-utils';
+	import { compareItems, rankItem, type RankingInfo } from '@tanstack/match-sorter-utils';
 	import { createQuery } from '@tanstack/svelte-query';
 	import DataDownloadButtonWithTooltip from './DataDownloadButtonWithTooltip.svelte';
 	import HighlightedSearchQuery from './HighlightedSearchQuery.svelte';
@@ -114,7 +114,7 @@
 		}
 	] satisfies ColumnDef<StationMetadata>[];
 
-	const fuzzyFilter: FilterFn<any> = (row, columnId, searchTerm, addMeta) => {
+	const fuzzyFilter: FilterFn<StationMetadata> = (row, columnId, searchTerm, addMeta) => {
 		let value = row.getValue(columnId);
 
 		if (columnId === 'stationType') {
@@ -128,17 +128,17 @@
 		return itemRank.passed;
 	};
 
-	const fuzzySort: SortingFn<any> = (rowA, rowB, columnId) => {
+	const fuzzySort: SortingFn<StationMetadata> = (rowA, rowB, columnId) => {
 		let dir = 0;
+		// set by fuzzyFilter through addMeta
+		const rankOf = (row: typeof rowA) =>
+			(row.columnFiltersMeta[columnId] as { itemRank: RankingInfo } | undefined)?.itemRank;
 
 		// Only sort by rank if the column has ranking information
-		if (rowA.columnFiltersMeta[columnId]) {
-			dir = compareItems(
-				// @ts-ignore
-				rowA.columnFiltersMeta[columnId]?.itemRank!,
-				// @ts-ignore
-				rowB.columnFiltersMeta[columnId]?.itemRank!
-			);
+		const rankA = rankOf(rowA);
+		const rankB = rankOf(rowB);
+		if (rankA && rankB) {
+			dir = compareItems(rankA, rankB);
 		}
 
 		// Provide an alphanumeric fallback for when the item ranks are equal

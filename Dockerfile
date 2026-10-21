@@ -3,7 +3,7 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN : \
     && corepack enable \
-    && corepack prepare pnpm@10.11.0 --activate
+    && corepack prepare pnpm@10.34.7 --activate
 COPY . /app
 WORKDIR /app
 

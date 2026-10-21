@@ -6,6 +6,7 @@ Dockerfile
 README.md
 .npmrc
 .prettierrc
+prettier.config.js
 .eslintrc.cjs
 .graphqlrc
 .editorconfig

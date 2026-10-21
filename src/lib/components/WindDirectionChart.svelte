@@ -98,11 +98,11 @@
 			yNice
 			{padding}
 			tooltip={{ mode: 'bisect-x' }}
-			let:yScale
-			let:xScale
+			let:yScale={chartYScale}
+			let:xScale={chartXScale}
 		>
-			{@const scaleY = yScale as ScaleLinear<number, number>}
-			{@const scaleX = xScale as ScaleLinear<number, number>}
+			{@const scaleY = chartYScale as ScaleLinear<number, number>}
+			{@const scaleX = chartXScale as ScaleLinear<number, number>}
 			<Svg>
 				<Axis
 					placement="left"
@@ -128,7 +128,7 @@
 						strokeWidth: 1
 					}}
 				/>
-				{#each stationNames as name, idx}
+				{#each stationNames as name}
 					<Highlight
 						y={(d) => d[name]}
 						points={{

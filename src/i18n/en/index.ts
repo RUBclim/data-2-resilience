@@ -795,8 +795,7 @@ const en = {
 			buildings: 'Buildings',
 			buildingsTooltip: {
 				title: 'Building footprints',
-				description:
-					'Show or hide building footprints on the map.'
+				description: 'Show or hide building footprints on the map.'
 			},
 			streets: 'Streets',
 			streetsTooltip: {

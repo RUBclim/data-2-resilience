@@ -49,7 +49,10 @@
 	}}
 />
 
-<label class={cn('group flex translate-y-1 flex-col gap-1', classNames?.container)} id="station-table-search">
+<label
+	class={cn('group flex translate-y-1 flex-col gap-1', classNames?.container)}
+	id="station-table-search"
+>
 	{#if label && label.length > 0}
 		<span class={cn('text-sm font-semibold', classNames?.label)}>{label}</span>
 	{/if}

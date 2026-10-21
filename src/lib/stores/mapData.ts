@@ -31,7 +31,7 @@ export function filterDoubleStations(stations: StationMetadata[]) {
 export async function fetchStations() {
 	const stationsMetadata = await api().getStationsMetadata();
 	const filteredStations = filterDoubleStations(stationsMetadata);
-	const stationsGeoJSONFeatures = filteredStations.map((station, idx) => ({
+	const stationsGeoJSONFeatures = filteredStations.map((station) => ({
 		id: station.id,
 		type: 'Feature' as const,
 		properties: station,

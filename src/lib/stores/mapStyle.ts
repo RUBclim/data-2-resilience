@@ -5968,9 +5968,20 @@ export const positronMapStyleNight = {
 	owner: 'Carto'
 } as StyleSpecification;
 
+type StyleJsonLayer = {
+	id: string;
+	layout?: Record<string, unknown>;
+	paint?: Record<string, unknown>;
+};
 
-function createStyleWithSatellite(baseStyle: StyleSpecification, includeSatellite: boolean): StyleSpecification {
-	const style = JSON.parse(JSON.stringify(baseStyle)); // Deep clone
+function createStyleWithSatellite(
+	baseStyle: StyleSpecification,
+	includeSatellite: boolean
+): StyleSpecification {
+	// Deep clone; the layers are edited as plain json
+	const style = JSON.parse(JSON.stringify(baseStyle)) as Omit<StyleSpecification, 'layers'> & {
+		layers: StyleJsonLayer[];
+	};
 
 	if (includeSatellite) {
 		// Add satellite source using Dortmund orthophotos
@@ -5983,7 +5994,7 @@ function createStyleWithSatellite(baseStyle: StyleSpecification, includeSatellit
 		};
 
 		// Find the landuse layer index
-		const landuseIndex = style.layers.findIndex((layer: any) => layer.id === 'landuse');
+		const landuseIndex = style.layers.findIndex((layer) => layer.id === 'landuse');
 
 		// Create satellite layer
 		const satelliteLayer = {
@@ -6001,29 +6012,41 @@ function createStyleWithSatellite(baseStyle: StyleSpecification, includeSatellit
 			style.layers.splice(landuseIndex, 0, satelliteLayer);
 		} else {
 			// Fallback: insert after background if landuse not found
-			const backgroundIndex = style.layers.findIndex((layer: any) => layer.id === 'background');
+			const backgroundIndex = style.layers.findIndex((layer) => layer.id === 'background');
 			style.layers.splice(backgroundIndex + 1, 0, satelliteLayer);
 		}
 
 		// Enhance visibility in satellite mode
-		style.layers.forEach((layer: any) => {
+		style.layers.forEach((layer) => {
 			// Ensure buildings are visible over satellite imagery
 			if (layer.id === 'building' && layer.paint) {
 				const fillColor = layer.paint['fill-color'];
 				// Only override if the color is too dark for satellite view
-				if (typeof fillColor === 'object' && fillColor.stops) {
+				if (typeof fillColor === 'object' && fillColor !== null && 'stops' in fillColor) {
 					// Make buildings slightly lighter for better contrast over satellite
 					layer.paint['fill-color'] = '#dfdfdf';
-				} else if (typeof fillColor === 'string' && fillColor.startsWith('#') && fillColor !== '#dfdfdf') {
+				} else if (
+					typeof fillColor === 'string' &&
+					fillColor.startsWith('#') &&
+					fillColor !== '#dfdfdf'
+				) {
 					// Make dark colors lighter for satellite view
 					layer.paint['fill-color'] = '#dfdfdf';
 				}
 			}
 
 			// Hide redundant overlays since satellite imagery shows natural features
-			if (layer.id === 'water' || layer.id === 'water_shadow' || layer.id === 'waterway' || layer.id === 'waterway_label' ||
-				layer.id === 'landcover' || layer.id === 'landuse' || layer.id === 'landuse_residential' ||
-				layer.id === 'park_national_park' || layer.id === 'park_nature_reserve') {
+			if (
+				layer.id === 'water' ||
+				layer.id === 'water_shadow' ||
+				layer.id === 'waterway' ||
+				layer.id === 'waterway_label' ||
+				layer.id === 'landcover' ||
+				layer.id === 'landuse' ||
+				layer.id === 'landuse_residential' ||
+				layer.id === 'park_national_park' ||
+				layer.id === 'park_nature_reserve'
+			) {
 				if (!layer.layout) {
 					layer.layout = {};
 				}
@@ -6032,10 +6055,12 @@ function createStyleWithSatellite(baseStyle: StyleSpecification, includeSatellit
 		});
 	}
 
-	return style;
+	return style as StyleSpecification;
 }
-
 
 // Export satellite-enabled versions
 export const positronMapStyleDayWithSatellite = createStyleWithSatellite(positronMapStyleDay, true);
-export const positronMapStyleNightWithSatellite = createStyleWithSatellite(positronMapStyleNight, true);
+export const positronMapStyleNightWithSatellite = createStyleWithSatellite(
+	positronMapStyleNight,
+	true
+);
