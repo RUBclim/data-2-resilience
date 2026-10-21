@@ -1,3 +1,5 @@
+import { PUBLIC_VITE_BASE_URL } from '$env/static/public';
+
 /** @type {import('./$types').RequestHandler} */
 export async function GET() {
 	const body = robots();
@@ -8,11 +10,10 @@ export async function GET() {
 }
 
 const robots = () => {
-	const baseUrl = import.meta.env.PUBLIC_VITE_BASE_URL || 'http://localhost:5173';
 	return `
 User-agent: *
 Disallow: ${import.meta.env.PROD || import.meta.env.DEV ? '' : '/'}
 
-Sitemap: ${baseUrl}/sitemap.xml
+Sitemap: ${PUBLIC_VITE_BASE_URL}/sitemap.xml
   `;
 };
