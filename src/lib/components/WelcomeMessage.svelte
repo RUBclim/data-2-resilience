@@ -1,5 +1,5 @@
 <script lang="ts">
-	import LL, { locale } from '$i18n/i18n-svelte';
+	import LL, { locale } from '#i18n/i18n-svelte.js';
 	import {
 		closeLeftSidebar,
 		datavisType,
@@ -19,16 +19,15 @@
 		updateMinMaxAvg,
 		updateRangeEnd,
 		updateUnit
-	} from '$lib/stores/uiStore';
-	import { SidebarState } from '$lib/types/sidebar';
-	import { cn } from '$lib/utils';
-	import { today } from '$lib/utils/dateUtil';
+	} from '#lib/stores/uiStore.js';
+	import { SidebarState } from '#lib/types/sidebar.js';
+	import { cn } from '#lib/utils.js';
+	import { today } from '#lib/utils/dateUtil.js';
 	import { getHours } from 'date-fns';
-	import { ArrowDown, X } from 'lucide-svelte';
+	import { ArrowDown, X } from '@lucide/svelte';
 	import Shepherd, { type StepOptions, type StepOptionsButton, type Tour } from 'shepherd.js';
 	import 'shepherd.js/dist/css/shepherd.css';
 	import { onMount } from 'svelte';
-	import { queryParameters } from 'sveltekit-search-params';
 	import Button from './ui/button/button.svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
@@ -124,12 +123,11 @@
 		const pathWithLocale = `/${$locale}${path === '/' ? '' : path}`;
 		const fullPath = `${pathWithLocale}?${urlQuery}`;
 		if (currentPathname !== pathWithLocale) {
-			await goto(fullPath, { replaceState: true, keepFocus: true, noScroll: true });
+			await goto(fullPath, { replace: true, reset: false });
 		}
 	}
 
-	const queryParams = $derived(queryParameters());
-	const urlQuery = $derived(new URLSearchParams($queryParams).toString());
+	const urlQuery = $derived(page.url.searchParams.toString());
 
 	const buttons = $derived.by(() => ({
 		nextButton: {
@@ -428,7 +426,7 @@
 	class={cn(
 		'relative flex flex-col gap-2 p-6 transition-all',
 		'bg-muted',
-		opened ? 'py-6' : 'pb-0 pt-4'
+		opened ? 'py-6' : 'pt-4 pb-0'
 	)}
 >
 	{#if opened}
@@ -438,26 +436,26 @@
 		{/each}
 		<Button
 			size="icon"
-			on:click={handleClose}
-			class="absolute right-4 top-6 rounded-full text-muted-foreground"
+			onclick={handleClose}
+			class="absolute top-6 right-4 rounded-full text-muted-foreground"
 			variant="ghost"
 		>
 			<X />
 		</Button>
 		<div class="flex gap-4">
-			<Button on:click={handleClose}>
+			<Button onclick={handleClose}>
 				{$LL.welcome.buttons.confirm()}
 			</Button>
-			<Button variant="outline" on:click={() => tour?.start()}>
+			<Button variant="outline" onclick={() => tour?.start()}>
 				{$LL.welcome.buttons.launchTour()}
 			</Button>
 		</div>
 	{:else}
 		<Button
 			variant="ghost"
-			class="-ml-3 mb-1 flex h-fit w-fit cursor-pointer items-center gap-2 py-2 text-left text-sm"
+			class="mb-1 -ml-3 flex h-fit w-fit cursor-pointer items-center gap-2 py-2 text-left text-sm"
 			size="sm"
-			on:click={handleOpen}
+			onclick={handleOpen}
 		>
 			<ArrowDown class="size-4" />
 			{$LL.welcome.expandButtonLabel()}

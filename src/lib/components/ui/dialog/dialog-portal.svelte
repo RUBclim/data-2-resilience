@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { Dialog as DialogPrimitive } from 'bits-ui';
-	interface Props {
-		children?: import('svelte').Snippet;
-		[key: string]: any;
-	}
+	import { isNestedInPortal } from '../portal.js';
 
-	let { children, ...rest }: Props = $props();
-	type $$Props = DialogPrimitive.PortalProps;
+	let { children, ...rest }: DialogPrimitive.PortalProps = $props();
+
+	// floating content in the dialog stays in it, as with bits-ui 0.x
+	isNestedInPortal();
 </script>
 
 <DialogPrimitive.Portal {...rest}>

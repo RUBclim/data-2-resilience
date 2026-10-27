@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { LL } from '$i18n/i18n-svelte';
-	import { lors } from '$lib/stores/mapData';
-	import { addPopup } from '$lib/stores/mapPopupsStore.svelte';
+	import { LL } from '#i18n/i18n-svelte.js';
+	import { lors } from '#lib/stores/mapData.js';
+	import { addPopup } from '#lib/stores/mapPopupsStore.svelte.js';
 	import { mode } from 'mode-watcher';
 	import { FillLayer, GeoJSON, LineLayer, Popup } from 'svelte-maplibre';
 
@@ -49,7 +49,7 @@
 			visibility: visible ? 'visible' : 'none'
 		}}
 		paint={{
-			'line-color': $mode === 'dark' || displayMode === 'stroke' ? 'black' : 'white',
+			'line-color': mode.current === 'dark' || displayMode === 'stroke' ? 'black' : 'white',
 			'line-opacity': 1,
 			'line-width': displayMode === 'fill' ? 1.5 : 5
 		}}
@@ -61,7 +61,8 @@
 			visibility: visible ? 'visible' : 'none'
 		}}
 		paint={{
-			'line-color': displayMode === 'stroke' ? 'white' : $mode === 'dark' ? 'white' : 'black',
+			'line-color':
+				displayMode === 'stroke' ? 'white' : mode.current === 'dark' ? 'white' : 'black',
 			'line-opacity': 1,
 			'line-width': 1
 		}}

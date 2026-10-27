@@ -1,29 +1,26 @@
 <script lang="ts">
-	import * as Popover from '$lib/components/ui/popover';
-	import * as Tooltip from '$lib/components/ui/tooltip';
-	import { cn } from '$lib/utils';
-	import { Popover as PopoverPrimitive, Tooltip as TooltipPrimitive } from 'bits-ui';
-	import type { ClassArray, ClassDictionary } from 'clsx';
+	import * as Popover from '#lib/components/ui/popover/index.js';
+	import * as Tooltip from '#lib/components/ui/tooltip/index.js';
+	import { cn } from '#lib/utils.js';
+	import type { PopoverContentProps, TooltipContentProps, WithoutChildrenOrChild } from 'bits-ui';
+	import type { Snippet } from 'svelte';
 	import { MediaQuery } from 'svelte/reactivity';
 
-	type Props = {
-		class?: string | ClassArray | ClassDictionary | null | undefined;
+	type Props = WithoutChildrenOrChild<PopoverContentProps & TooltipContentProps> & {
+		children?: Snippet;
 	};
 
-	let {
-		class: className,
-		...restProps
-	}: Props & PopoverPrimitive.ContentProps & TooltipPrimitive.ContentProps = $props();
+	let { class: className, children, ...restProps }: Props = $props();
 
 	const isTouch = new MediaQuery('any-hover: none', false);
 </script>
 
 {#if isTouch.current}
 	<Popover.Content class={cn('w-auto px-3 py-1.5 text-sm', className)} side="top" {...restProps}>
-		{@render restProps.children?.()}
+		{@render children?.()}
 	</Popover.Content>
 {:else}
 	<Tooltip.Content class={cn('font-medium', className)} {...restProps}>
-		{@render restProps.children?.()}
+		{@render children?.()}
 	</Tooltip.Content>
 {/if}

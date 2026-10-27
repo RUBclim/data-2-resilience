@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { LL } from '$i18n/i18n-svelte';
+	import { LL } from '#i18n/i18n-svelte.js';
 	import {
 		deselectAllStations,
 		deselectStation,
 		selectStation,
 		useStations
-	} from '$lib/stores/stationsStore';
-	import { cn } from '$lib/utils';
-	import type { StationMetadata } from '$lib/utils/schemas';
-	import MultiSelect, { type MultiSelectEvents, type ObjectOption } from 'svelte-multiselect';
+	} from '#lib/stores/stationsStore.js';
+	import { cn } from '#lib/utils.js';
+	import type { StationMetadata } from '#lib/utils/schemas.js';
+	import MultiSelect, { type ObjectOption, type Option } from 'svelte-multiselect';
 
 	interface Props {
 		stations: {
@@ -20,6 +20,7 @@
 
 	let { stations, initialStationIds = [] }: Props = $props();
 
+	// svelte-ignore state_referenced_locally
 	const selectedStations = useStations({ initialStationIds, stations });
 
 	let formattedStations = $derived(
@@ -41,15 +42,15 @@
 			.sort((a, b) => a.label.localeCompare(b.label))
 	);
 
-	function onAdd(e: MultiSelectEvents['add']) {
-		const opt = e.detail.option as ObjectOption;
+	function onAdd({ option }: { option: Option }) {
+		const opt = option as ObjectOption;
 		const val = opt.value as string;
 		if (!val) return;
 		selectStation(val);
 	}
 
-	function onRemove(e: MultiSelectEvents['remove']) {
-		const opt = e.detail.option as ObjectOption;
+	function onRemove({ option }: { option: Option }) {
+		const opt = option as ObjectOption;
 		const val = opt.value as string;
 		if (!val) return;
 		deselectStation(val);
@@ -67,7 +68,7 @@
 	<div
 		class={cn(
 			'multiselect-wrapper mb-4',
-			'[&:has(input:focus-visible)]:outline-none [&:has(input:focus-visible)]:ring-2 [&:has(input:focus-visible)]:ring-ring',
+			'[&:has(input:focus-visible)]:ring-2 [&:has(input:focus-visible)]:ring-ring [&:has(input:focus-visible)]:outline-hidden',
 			'[&:has(input:focus-visible)]:ring-offset-2 [&:has(input:focus-visible)]:ring-offset-background',
 			'[&:has(input:focus-visible)]:rounded-md [&:has(input:focus-visible)]:bg-background'
 		)}
@@ -75,9 +76,9 @@
 		<MultiSelect
 			selected={formattedSelectedStations}
 			options={formattedStations}
-			on:add={onAdd}
-			on:remove={onRemove}
-			on:removeAll={onRemoveAll}
+			onadd={onAdd}
+			onremove={onRemove}
+			onremoveAll={onRemoveAll}
 			outerDivClass="multiselect"
 			selectedOptionsDraggable={false}
 			placeholder={$LL.pages.measurements.stationsSelect.placeholder()}
@@ -124,8 +125,24 @@
 		--sms-li-active-bg: hsl(var(--muted));
 	}
 
-	.multiselect-wrapper :global(.multiselect > svg) {
-		display: none;
+	/* !important: svelte-multiselect sets `display: flex` inline since 11.x */
+	.multiselect-wrapper :global(.multiselect > .expand-icon) {
+		display: none !important;
+	}
+
+	/* svelte-multiselect 11.0 drew the cross icons 15px wide and high; later versions size them
+	   with `height: 1em` and the remove-all icon with 17px */
+	.multiselect-wrapper :global(div.multiselect button.remove svg) {
+		width: 15px !important;
+		height: 15px;
+	}
+
+	/* svelte-multiselect styles its buttons with :is() instead of zero-specificity :where() since
+	   11.x, which overrides the button reset of tailwind's preflight */
+	.multiselect-wrapper :global(div.multiselect button) {
+		margin: 0;
+		padding: 0;
+		aspect-ratio: auto;
 	}
 
 	.multiselect-wrapper :global(button.remove:focus-visible) {

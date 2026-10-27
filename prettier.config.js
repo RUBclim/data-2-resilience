@@ -18,6 +18,8 @@ export default {
 	trailingComma: 'none',
 	printWidth: 100,
 	plugins: [plugin('prettier-plugin-svelte'), plugin('prettier-plugin-tailwindcss')],
+	// the theme (tailwind 4 has no js config) for the class order
+	tailwindStylesheet: './src/app.css',
 	overrides: [
 		{
 			files: '*.svelte',

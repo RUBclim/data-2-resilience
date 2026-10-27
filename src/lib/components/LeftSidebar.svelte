@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import LL, { locale } from '$i18n/i18n-svelte';
-	import { isLeftSidebarOpened } from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
+	import LL, { locale } from '#i18n/i18n-svelte.js';
+	import { isLeftSidebarOpened } from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
 	import { onMount } from 'svelte';
-	import { queryParameters } from 'sveltekit-search-params';
 	import WelcomeMessage from './WelcomeMessage.svelte';
 	interface Props {
 		children?: import('svelte').Snippet;
@@ -36,8 +35,7 @@
 	const isAboutPage = $derived(page.url.pathname.startsWith(`/${$locale}/about`));
 	const showLeftSidebar = $derived(!isAboutPage && $isLeftSidebarOpened);
 
-	const queryParams = $derived(queryParameters());
-	const urlQuery = $derived(new URLSearchParams($queryParams).toString());
+	const urlQuery = $derived(page.url.searchParams.toString());
 
 	onMount(() => {
 		document.getElementById('left-sidebar-scroll-container')?.addEventListener('scroll', () => {
@@ -54,12 +52,12 @@
 </script>
 
 {#if showLeftSidebar}
-	<aside class={cn('w-[var(--leftSidebarWidth)]', 'transition-all duration-300 ease-in-out')}>
+	<aside class={cn('w-(--leftSidebarWidth)', 'transition-all duration-300 ease-in-out')}>
 		<div
 			class={cn(
-				'sidebar-content absolute left-0 top-0 z-50',
-				'h-[calc(100vh-var(--headerHeight,5rem))] w-[var(--leftSidebarWidth)]',
-				'overflow-y-auto overflow-x-clip',
+				'sidebar-content absolute top-0 left-0 z-50',
+				'h-[calc(100vh-var(--headerHeight,5rem))] w-(--leftSidebarWidth)',
+				'overflow-x-clip overflow-y-auto',
 				'transition-all duration-300 ease-in-out'
 			)}
 			id="left-sidebar-scroll-container"
@@ -76,9 +74,9 @@
 			>
 				<ul
 					class={cn(
-						'flex w-[var(--leftSidebarWidth)] translate-y-px',
+						'flex w-(--leftSidebarWidth) translate-y-px',
 						'overflow-x-auto overflow-y-clip pt-2 transition-all',
-						'[&:has(:focus-visible)]:overflow-visible'
+						'has-focus-visible:overflow-visible'
 					)}
 				>
 					{#each tabs as tab (tab.slug)}
@@ -87,7 +85,7 @@
 							class={cn(
 								'relative -mb-px -ml-px flex',
 								tab.isActive && 'z-10',
-								'[&:has(:focus-visible)]:z-20'
+								'has-focus-visible:z-20'
 							)}
 						>
 							<a
@@ -97,19 +95,19 @@
 									urlQuery ? `?${urlQuery}` : ''
 								].join('')}
 								class={cn(
-									'focusable px-4 pb-2 pt-3 transition focus-visible:rounded-lg',
-									'text-nowrap border border-transparent focus-visible:z-10 hover-hover:hover:z-50',
+									'focusable px-4 pt-3 pb-2 transition focus-visible:rounded-lg',
+									'border border-transparent text-nowrap hover:z-50 focus-visible:z-10',
 									tab.slug === tabs[0].slug ? 'rounded-tr-lg pl-6' : ' rounded-t-lg',
 									tab.isActive &&
 										cn(
-											'border-border border-b-background border-t-primary bg-background font-semibold',
+											'border-border border-t-primary border-b-background bg-background font-semibold',
 											'shadow-[inset_0_1px_0_0_hsl(var(--primary)),0_-1px_0_0_hsl(var(--primary))]'
 										),
 									tab.isActive && tab.slug === tabs[0].slug && 'border-l-background',
 									!tab.isActive &&
 										cn(
-											'hover-hover:hover:border-border hover-hover:hover:border-b-border',
-											'hover-hover:hover:bg-background',
+											'hover:border-border hover:border-b-border',
+											'hover:bg-background',
 											'border-b-2 focus-visible:border-b'
 										)
 								)}>{tab.name}</a

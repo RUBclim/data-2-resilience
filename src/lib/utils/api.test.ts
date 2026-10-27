@@ -64,7 +64,7 @@ describe('getStationsMetadata', () => {
 	it('reports schema violations readable', async () => {
 		const { fetch } = stubFetch(() => json({ data: [{ ...rawStation, latitude: 'north' }] }));
 		await expect(api(fetch).getStationsMetadata()).rejects.toThrow(
-			/Validation error: Expected number, received string at "data\[0\]\.latitude"/
+			/Validation error: Invalid input: expected number, received string at "data\[0\]\.latitude"/
 		);
 	});
 

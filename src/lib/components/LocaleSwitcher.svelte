@@ -1,19 +1,19 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { invalidateAll } from '$app/navigation';
+	import { browser } from '$app/env';
+	import { refreshAll } from '$app/navigation';
 	import { page } from '$app/state';
-	import { locale, setLocale } from '$i18n/i18n-svelte';
-	import type { Locales } from '$i18n/i18n-types';
-	import { locales } from '$i18n/i18n-util';
-	import { loadLocaleAsync } from '$i18n/i18n-util.async';
-	import { cn } from '$lib/utils';
+	import { locale, setLocale } from '#i18n/i18n-svelte.js';
+	import type { Locales } from '#i18n/i18n-types.js';
+	import { locales } from '#i18n/i18n-util.js';
+	import { loadLocaleAsync } from '#i18n/i18n-util.async.js';
+	import { cn } from '#lib/utils.js';
 	import { replaceLocaleInUrl } from '../../utils';
 	import {
 		DropdownMenu,
 		DropdownMenuContent,
 		DropdownMenuItem,
 		DropdownMenuTrigger
-	} from '$lib/components/ui/dropdown-menu';
+	} from '#lib/components/ui/dropdown-menu/index.js';
 	import { Button } from './ui/button';
 
 	const switchLocale = async (newLocale: Locales, updateHistoryState = true) => {
@@ -31,7 +31,7 @@
 		}
 
 		// run the `load` function again
-		invalidateAll();
+		refreshAll();
 	};
 
 	// update `lang` attribute
@@ -71,11 +71,11 @@
 	</DropdownMenuTrigger>
 	<DropdownMenuContent class="w-fit min-w-0">
 		{#each locales as l}
-			<DropdownMenuItem
-				href={replaceLocaleInUrl(page.url, l)}
-				class={cn(l === $locale && 'font-bold')}
-			>
-				{getLocaleName(l)}
+			<!-- bits-ui 2 menu items have no `href`: render the link of bits-ui 0.x ourselves -->
+			<DropdownMenuItem class={cn(l === $locale && 'font-bold')}>
+				{#snippet child({ props })}
+					<a {...props} href={replaceLocaleInUrl(page.url, l)}>{getLocaleName(l)}</a>
+				{/snippet}
 			</DropdownMenuItem>
 		{/each}
 	</DropdownMenuContent>

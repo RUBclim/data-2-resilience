@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LL, locale } from '$i18n/i18n-svelte';
+	import { LL, locale } from '#i18n/i18n-svelte.js';
 	import {
 		datavisType,
 		dayValue,
@@ -9,9 +9,9 @@
 		udpateDay,
 		udpateRangeStart,
 		updateRangeEnd
-	} from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
-	import { isToday, today } from '$lib/utils/dateUtil';
+	} from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
+	import { isToday, today } from '#lib/utils/dateUtil.js';
 	import { addDays } from 'date-fns';
 	import { RangeSlider } from 'svelte-range-slider-pips';
 	import HourInput from './HourInput.svelte';
@@ -95,7 +95,7 @@
 		<Button
 			variant={$datavisType === 'hour' ? 'default' : 'outline'}
 			size="sm"
-			on:click={() => udpateDatavisType('hour')}
+			onclick={() => udpateDatavisType('hour')}
 			class="rounded-r-none focus-visible:z-10 focus-visible:rounded"
 		>
 			{$LL.pages.measurements.dateRangeSlider.hour()}
@@ -103,7 +103,7 @@
 		<Button
 			variant={$datavisType === 'day' ? 'default' : 'outline'}
 			size="sm"
-			on:click={() => udpateDatavisType('day')}
+			onclick={() => udpateDatavisType('day')}
 			class="-ml-px rounded-none focus-visible:z-10 focus-visible:rounded"
 		>
 			{$LL.pages.measurements.dateRangeSlider.day()}
@@ -111,7 +111,7 @@
 		<Button
 			variant={$datavisType === 'range' ? 'default' : 'outline'}
 			size="sm"
-			on:click={() => udpateDatavisType('range')}
+			onclick={() => udpateDatavisType('range')}
 			class="-ml-px rounded-l-none focus-visible:z-10 focus-visible:rounded"
 		>
 			{$LL.pages.measurements.dateRangeSlider.range()}
@@ -148,15 +148,15 @@
 		--range-pip-in-range-text: hsl(var(--muted-foreground));
 	}
 
-	:global(.date-range-slider .rangePips .pip.first > .pipVal) {
+	:global(.date-range-slider .rangePips .rsPip--first > .rsPipVal) {
 		transform: translate(0, 25%);
 	}
 
-	:global(.date-range-slider .rangePips .pip.last > .pipVal) {
+	:global(.date-range-slider .rangePips .rsPip--last > .rsPipVal) {
 		transform: translate(-100%, 25%);
 	}
 
-	:global(.date-range-slider .rangePips .pip.selected .pipVal) {
+	:global(.date-range-slider .rangePips .rsPip.rsSelected .rsPipVal) {
 		top: 0.4em;
 	}
 

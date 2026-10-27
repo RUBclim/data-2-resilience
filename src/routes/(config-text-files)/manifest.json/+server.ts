@@ -1,4 +1,4 @@
-import type { TranslationFunctions } from '$i18n/i18n-types.js';
+import type { TranslationFunctions } from '#i18n/i18n-types.js';
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({

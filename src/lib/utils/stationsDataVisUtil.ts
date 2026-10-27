@@ -1,5 +1,5 @@
-import type { TranslationFunctions } from '$i18n/i18n-types';
-import type { StationsGeoJSONType } from '$lib/stores/mapData';
+import type { TranslationFunctions } from '#i18n/i18n-types.js';
+import type { StationsGeoJSONType } from '#lib/stores/mapData.js';
 
 export function getMessageForUnsupportedStations({
 	ids,

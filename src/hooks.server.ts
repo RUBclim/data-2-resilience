@@ -1,19 +1,15 @@
-import { sequence } from '@sveltejs/kit/hooks';
+import { redirect, type RequestEvent } from '@sveltejs/kit';
+import { sequence, type Handle } from '@sveltejs/kit/hooks';
 import * as Sentry from '@sentry/sveltekit';
-import { base } from '$app/paths';
-import type { Locales } from '$i18n/i18n-types.js';
-import { detectLocale, i18n, isLocale } from '$i18n/i18n-util';
-import { loadAllLocales } from '$i18n/i18n-util.sync';
-import { redirect, type Handle, type RequestEvent } from '@sveltejs/kit';
+import type { Locales } from '#i18n/i18n-types.js';
+import { detectLocale, i18n, isLocale } from '#i18n/i18n-util.js';
+import { loadAllLocales } from '#i18n/i18n-util.sync.js';
 import { initAcceptLanguageHeaderDetector } from 'typesafe-i18n/detectors';
 import { getPathnameWithoutBase } from './utils.js';
-import { PUBLIC_SENTRY_DSN, PUBLIC_SENTRY_TRACES_SAMPLE_RATE } from '$env/static/public';
+import { PUBLIC_SENTRY_DSN } from '$app/env/public';
 import { handleProxies } from '@kitql/handles';
 
-Sentry.init({
-	dsn: PUBLIC_SENTRY_DSN,
-	tracesSampleRate: Number(PUBLIC_SENTRY_TRACES_SAMPLE_RATE)
-});
+// Sentry.init() is in instrumentation.server.ts
 loadAllLocales();
 const L = i18n();
 
@@ -61,7 +57,7 @@ export const handle: Handle = sequence(
 		if (!lang) {
 			const locale = getPreferredLocale(event);
 
-			throw redirect(307, `${base}/${locale}`);
+			throw redirect(307, `/${locale}`);
 		}
 
 		// if slug is not a locale, use base locale (e.g. api endpoints)
@@ -69,10 +65,8 @@ export const handle: Handle = sequence(
 		const LL = L[locale];
 
 		// bind locale and translation functions to current request
-		event.locals = {
-			locale,
-			LL
-		};
+		event.locals.locale = locale;
+		event.locals.LL = LL;
 
 		// replace html lang attribute with correct language
 		return resolve(event, { transformPageChunk: ({ html }) => html.replace('%lang%', locale) });

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { PopoverTrigger } from '$lib/components/ui/popover';
-	import { TooltipTrigger } from '$lib/components/ui/tooltip';
+	import { PopoverTrigger } from '#lib/components/ui/popover/index.js';
+	import { TooltipTrigger } from '#lib/components/ui/tooltip/index.js';
 	import type { PopoverTriggerProps, TooltipTriggerProps } from 'bits-ui';
 	import { MediaQuery } from 'svelte/reactivity';
 
@@ -10,11 +10,7 @@
 </script>
 
 {#if isTouch.current}
-	<PopoverTrigger {...restProps}>
-		{@render restProps.children?.()}
-	</PopoverTrigger>
+	<PopoverTrigger {...restProps} />
 {:else}
-	<TooltipTrigger {...restProps}>
-		{@render restProps.children?.()}
-	</TooltipTrigger>
+	<TooltipTrigger {...restProps} />
 {/if}

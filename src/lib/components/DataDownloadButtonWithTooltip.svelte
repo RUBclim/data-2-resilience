@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { LL } from '$i18n/i18n-svelte';
-	import { Download } from 'lucide-svelte';
+	import { LL } from '#i18n/i18n-svelte.js';
+	import { Download } from '@lucide/svelte';
 	import Button from './ui/button/button.svelte';
-	import { PUBLIC_API_BASE_URL } from '$env/static/public';
+	import { PUBLIC_API_BASE_URL } from '$app/env/public';
 	import {
 		PopoverTooltip,
 		PopoverTooltipContent,

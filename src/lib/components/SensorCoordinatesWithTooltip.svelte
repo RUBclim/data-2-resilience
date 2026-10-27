@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { LL, locale } from '$i18n/i18n-svelte';
-	import { cn } from '$lib/utils';
-	import { Check, ChevronDown, Copy, LoaderCircle, MapPin } from 'lucide-svelte';
+	import { LL, locale } from '#i18n/i18n-svelte.js';
+	import { cn } from '#lib/utils.js';
+	import { Check, ChevronDown, Copy, LoaderCircle, MapPin } from '@lucide/svelte';
 	import HighlightedSearchQuery from './HighlightedSearchQuery.svelte';
 	import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from './ui/dropdown-menu';
 	import DropdownMenuItem from './ui/dropdown-menu/dropdown-menu-item.svelte';
@@ -34,35 +34,39 @@
 	});
 </script>
 
-<DropdownMenu closeOnItemClick={false}>
+<DropdownMenu>
 	<DropdownMenuTrigger
 		class={cn(
-			'focusable hover-hover:hover:bg-foreground hover-hover:hover:text-background',
-			'group flex items-center gap-2 whitespace-nowrap rounded-full p-1 transition',
-			text && '-ml-2.5 pl-2.5 pr-1.5'
+			'focusable hover:bg-foreground hover:text-background',
+			'group flex items-center gap-2 rounded-full p-1 whitespace-nowrap transition',
+			text && '-ml-2.5 pr-1.5 pl-2.5'
 		)}
 	>
 		<span>
 			<HighlightedSearchQuery {text} {searchQuery} />
 		</span>
 		<ChevronDown
-			class={cn('size-4', text && 'text-muted-foreground hover-hover:group-hover:text-background')}
+			class={cn('size-4', text && 'text-muted-foreground group-hover:text-background')}
 		/>
 	</DropdownMenuTrigger>
 	<DropdownMenuContent>
-		<DropdownMenuItem class="flex w-full cursor-pointer items-center justify-between gap-6">
+		<DropdownMenuItem
+			closeOnSelect={false}
+			class="flex w-full cursor-pointer items-center justify-between gap-6"
+		>
 			<a href={googleMapsLink} target="_blank" rel="noopener noreferrer" class="contents">
 				{$LL.pages.stations.table.cells.coordinates.googleMapsLinkText()}
 				<MapPin class="size-5 text-muted-foreground" />
 			</a>
 		</DropdownMenuItem>
 		<DropdownMenuItem
+			closeOnSelect={false}
 			class={cn(
 				'flex w-full cursor-pointer items-center justify-between gap-6',
 				copyState === 'copied' &&
 					cn(
 						'bg-green-100 text-green-800',
-						'data-[highlighted]:bg-green-100 data-[highlighted]:text-green-800'
+						'data-highlighted:bg-green-100 data-highlighted:text-green-800'
 					)
 			)}
 			onclick={copyToClipboard}

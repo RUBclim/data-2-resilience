@@ -1,43 +1,34 @@
 <script lang="ts">
-	import { Dialog as DialogPrimitive } from 'bits-ui';
-	import X from 'lucide-svelte/icons/x';
+	import { Dialog as DialogPrimitive, type WithoutChildrenOrChild } from 'bits-ui';
+	import type { Snippet } from 'svelte';
 	import * as Dialog from './index.js';
-	import { cn, flyAndScale } from '$lib/utils.js';
+	import { cn, flyAndScale } from '#lib/utils.js';
 
-	type $$Props = DialogPrimitive.ContentProps;
+	type Props = WithoutChildrenOrChild<DialogPrimitive.ContentProps> & {
+		children?: Snippet;
+	};
 
-	interface Props {
-		class?: $$Props['class'];
-		transition?: $$Props['transition'];
-		transitionConfig?: $$Props['transitionConfig'];
-		children?: import('svelte').Snippet;
-		[key: string]: any;
-	}
-
-	let {
-		class: className = undefined,
-		transition = flyAndScale,
-		transitionConfig = {
-			duration: 200
-		},
-		children,
-		...rest
-	}: Props = $props();
+	let { class: className = undefined, children, ...rest }: Props = $props();
 </script>
 
 <Dialog.Portal>
 	<Dialog.Overlay />
 	<DialogPrimitive.Content
-		{transition}
-		{transitionConfig}
+		forceMount
 		class={cn(
-			'fixed left-[50%] top-[50%] z-50 grid w-full bg-background',
+			'fixed top-[50%] left-[50%] z-50 grid w-full bg-background',
 			'max-w-lg translate-x-[-50%] translate-y-[-50%]',
 			'gap-4 border p-6 shadow-lg sm:rounded-lg md:w-full',
 			className
 		)}
 		{...rest}
 	>
-		{@render children?.()}
+		{#snippet child({ props, open })}
+			{#if open}
+				<div {...props} transition:flyAndScale={{ duration: 200 }}>
+					{@render children?.()}
+				</div>
+			{/if}
+		{/snippet}
 	</DialogPrimitive.Content>
 </Dialog.Portal>

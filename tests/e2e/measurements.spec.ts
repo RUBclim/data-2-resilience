@@ -3,7 +3,7 @@ import { appUrl, expect, open, revealTooltip, test, waitForUrlToSettle } from '.
 
 const datavis = (page: Page) => page.locator('#stations-datavis');
 const histogram = (page: Page) => page.locator('#stations-histogram');
-const chartSvg = (container: Locator) => container.locator('svg.layercake-layout-svg').first();
+const chartSvg = (container: Locator) => container.locator('svg.lc-layout-svg').first();
 const hourButton = (page: Page, direction: 'later' | 'earlier') =>
 	page.locator(`button[aria-label="Select an hour ${direction}"]`);
 const exportMenuButton = (container: Locator) =>
@@ -407,7 +407,7 @@ test.describe('charts', () => {
 		page
 	}) => {
 		await open(page, '/en');
-		const bins = histogram(page).locator('.tooltip-rects rect');
+		const bins = histogram(page).locator('.lc-tooltip-rect');
 		await expect(bins.first()).toBeVisible();
 		const count = await bins.count();
 		for (let i = 0; i < count; i++) {
@@ -425,7 +425,7 @@ test.describe('charts', () => {
 
 	test('the ordinal histogram selects all stations of a category', async ({ page }) => {
 		await open(page, appUrl('/en', { unit: 'utci_category' }));
-		const bins = histogram(page).locator('.tooltip-rects rect');
+		const bins = histogram(page).locator('.lc-tooltip-rect');
 		await expect(bins.first()).toBeVisible();
 		const count = await bins.count();
 		for (let i = 0; i < count; i++) {

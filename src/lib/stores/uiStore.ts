@@ -1,7 +1,7 @@
-import { browser } from '$app/environment';
-import LL, { locale } from '$i18n/i18n-svelte';
-import { SIDEBAR_STATE_CYCLE, SidebarState } from '$lib/types/sidebar';
-import { limitDateBoundsToToday } from '$lib/utils/dateUtil';
+import { browser } from '$app/env';
+import LL, { locale } from '#i18n/i18n-svelte.js';
+import { SIDEBAR_STATE_CYCLE, SidebarState } from '#lib/types/sidebar.js';
+import { limitDateBoundsToToday } from '#lib/utils/dateUtil.js';
 import {
 	addDays,
 	endOfDay,
@@ -15,7 +15,8 @@ import {
 import { de, enUS } from 'date-fns/locale';
 import { debounce } from 'es-toolkit';
 import { derived, writable } from 'svelte/store';
-import { queryParam, ssp } from 'sveltekit-search-params';
+import { ssp } from 'sveltekit-search-params';
+import { queryParam } from './queryParam.svelte';
 import { z } from 'zod';
 import { today } from './../utils/dateUtil';
 
@@ -161,9 +162,11 @@ export const unitWithMinMaxAvg = derived(
 		return mMA === 'avg' || iCU ? u : `${u}_${mMA}`;
 	}
 );
+
 export const unitWithoutCategory = derived(unit, (u) =>
 	u.replace(/_category$/, '') === 'pet' ? ('pet' as const) : ('utci' as const)
 );
+
 export const unitLabel = derived([unit, LL], ([u, ll]) => {
 	return ll.pages.measurements.unitSelect.units[
 		u as keyof typeof ll.pages.measurements.unitSelect.units
@@ -193,11 +196,13 @@ export const hour = derived([hourQueryParam, dayEndDate], ([value, dayEndDateVal
 	});
 	return getHours(d);
 });
+
 export const isHourScale = derived(
 	[scale, hour],
 	([s, h]) => s === 'hourly' && typeof h === 'number'
 );
 export const hourKey = derived([isHourScale, hour], ([isH, h]) => (isH ? h : undefined));
+
 export const updateHour = derived(hour, (prevH) => (h: number) => {
 	if (prevH === h) return h;
 	hourQueryParam.set(h);
@@ -301,6 +306,7 @@ export const mapLongitude = derived(longitudeQueryParam, (value: number) =>
 	validateQueryParam(value, z.coerce.number(), lonDefault)
 );
 const zoomQueryParam = queryParam('zoom', ssp.number(defaultViewport[2]), options);
+
 export const mapZoom = derived(zoomQueryParam, (value: number) =>
 	validateQueryParam(value, z.coerce.number(), zoomDefault)
 );

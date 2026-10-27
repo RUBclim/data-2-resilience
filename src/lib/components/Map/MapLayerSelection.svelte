@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { LL, locale } from '$i18n/i18n-svelte';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { LL, locale } from '#i18n/i18n-svelte.js';
+	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.js';
 	import {
 		boundariesMode,
 		isLeftSidebarOpened,
@@ -12,28 +12,39 @@
 		updateShowSatellite,
 		updateShowBuildings,
 		updateShowStreets
-	} from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
-	import type { Builder } from 'bits-ui';
-	import CheckboxIcon from 'components/CheckboxIcon.svelte';
-	import InfoTooltip from 'components/InfoTooltip.svelte';
-	import Button from 'components/ui/button/button.svelte';
-	import type { Props as ButtonProps } from 'components/ui/button/index.ts';
-	import { Layers3 } from 'lucide-svelte';
+	} from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
+	import CheckboxIcon from '#lib/components/CheckboxIcon.svelte';
+	import InfoTooltip from '#lib/components/InfoTooltip.svelte';
+	import Button from '#lib/components/ui/button/button.svelte';
+	import { Layers3 } from '@lucide/svelte';
 
 	const isAboutPage = $derived(page.url.pathname.startsWith(`/${$locale}/about`));
 	const showLeftSidebar = $derived(!isAboutPage && $isLeftSidebarOpened);
+
+	let menuContent = $state<HTMLElement | null>(null);
+
+	// the first tabbable element of the menu is the info button of its first item: focusing it on
+	// open showed its tooltip under the pointer, which caught the end of the opening click and so
+	// toggled the city districts. Focus the menu itself, as bits-ui does for menus without nested
+	// buttons (keyboard users still land on the first item).
+	function focusMenu(e: Event) {
+		e.preventDefault();
+		menuContent?.focus({ preventScroll: true });
+	}
 </script>
 
-<DropdownMenu.Root closeOnItemClick={false}>
-	<DropdownMenu.Trigger asChild aria-label={$LL.map.layersSelection.ariaLabel()}>
-		{#snippet children({ builder }: { builder: Builder<ButtonProps> })}
+<DropdownMenu.Root>
+	<!-- bits-ui 0.x dropped the aria-label of asChild triggers: bits-ui 2 would render it and change the
+	accessible name (KNOWN BUG in the e2e tests), so it stays off for now -->
+	<DropdownMenu.Trigger>
+		{#snippet child({ props })}
 			<Button
-				builders={[builder]}
+				{...props}
 				variant="ghost"
 				size="icon"
 				class={cn(
-					'fixed right-4 top-[calc(var(--headerHeight,5rem)+6rem)] z-50 flex flex-col gap-px',
+					'fixed top-[calc(var(--headerHeight,5rem)+6rem)] right-4 z-50 flex flex-col gap-px',
 					'rounded-md border border-border bg-border',
 					'shadow-lg transition duration-300 ease-in-out dark:shadow-black/80',
 					'size-10 bg-background',
@@ -45,9 +56,10 @@
 			</Button>
 		{/snippet}
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content align="end" class="w-56">
+	<DropdownMenu.Content bind:ref={menuContent} onOpenAutoFocus={focusMenu} align="end" class="w-56">
 		<DropdownMenu.Item
-			on:click={() => {
+			closeOnSelect={false}
+			onSelect={() => {
 				if ($boundariesMode === 'districts') {
 					updateBoundariesMode('none');
 				} else {
@@ -71,7 +83,8 @@
 			/>
 		</DropdownMenu.Item>
 		<DropdownMenu.Item
-			on:click={() => {
+			closeOnSelect={false}
+			onSelect={() => {
 				if ($boundariesMode === 'lors') {
 					updateBoundariesMode('none');
 				} else {
@@ -96,7 +109,8 @@
 		</DropdownMenu.Item>
 		<DropdownMenu.Separator />
 		<DropdownMenu.Item
-			on:click={() => updateShowSatellite(!$showSatellite)}
+			closeOnSelect={false}
+			onSelect={() => updateShowSatellite(!$showSatellite)}
 			class={cn('grid grid-cols-[auto_1fr_auto] items-center gap-2')}
 		>
 			<CheckboxIcon checked={$showSatellite} />
@@ -110,7 +124,8 @@
 		</DropdownMenu.Item>
 
 		<DropdownMenu.Item
-			on:click={() => updateShowBuildings(!$showBuildings)}
+			closeOnSelect={false}
+			onSelect={() => updateShowBuildings(!$showBuildings)}
 			class={cn('grid grid-cols-[auto_1fr_auto] items-center gap-2')}
 		>
 			<CheckboxIcon checked={$showBuildings} />
@@ -125,7 +140,8 @@
 
 		<!-- In the template, add this after the Buildings checkbox -->
 		<DropdownMenu.Item
-			on:click={() => updateShowStreets(!$showStreets)}
+			closeOnSelect={false}
+			onSelect={() => updateShowStreets(!$showStreets)}
 			class={cn('grid grid-cols-[auto_1fr_auto] items-center gap-2')}
 		>
 			<CheckboxIcon checked={$showStreets} />

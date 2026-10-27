@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { LL, locale } from '$i18n/i18n-svelte';
-	import { sortUnitByLabel } from '$lib/utils/textUtil';
+	import { LL, locale } from '#i18n/i18n-svelte.js';
+	import { sortUnitByLabel } from '#lib/utils/textUtil.js';
 	import CollapsibleParagraph from './CollapsibleParagraph.svelte';
 
 	interface Props {
@@ -63,7 +63,7 @@
 		</h2>
 		<CollapsibleParagraph linesClampedCount={3} className="text-sm">
 			<p>{description}</p>
-			<strong class="mb-1 mt-4 block text-base font-semibold">
+			<strong class="mt-4 mb-1 block text-base font-semibold">
 				{$LL.pages.stations.stationsDescriptions.measuredIndicatorsLabel()}:
 			</strong>
 			<ul class="flex flex-col gap-1 pb-4">
@@ -77,7 +77,7 @@
 				{/each}
 			</ul>
 			<p>{descriptionCalculated}</p>
-			<strong class="mb-1 mt-4 block text-base font-semibold">
+			<strong class="mt-4 mb-1 block text-base font-semibold">
 				{$LL.pages.stations.stationsDescriptions.calculatedIndicatorsLabel()}:
 			</strong>
 			<ul class="flex flex-col gap-1 pb-4">

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import LL, { locale } from '$i18n/i18n-svelte';
+	import LL, { locale } from '#i18n/i18n-svelte.js';
 
 	interface Props {
 		status?: number;
@@ -37,7 +37,7 @@
 				{#each links as link (link.href)}
 					<a
 						href={link.href}
-						class="inline-flex items-center rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+						class="inline-flex items-center rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background focus:outline-hidden"
 					>
 						{link.text}
 					</a>

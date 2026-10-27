@@ -1,31 +1,32 @@
 <script lang="ts">
-	import { LL, locale } from '$i18n/i18n-svelte';
-	import type { StationsGeoJSONType } from '$lib/stores/mapData';
-	import { toggleStationSelection, useStations } from '$lib/stores/stationsStore';
-	import { unit, unitLabel, unitOnly, unitWithMinMaxAvg } from '$lib/stores/uiStore';
-	import { getColorScaleValue } from '$lib/utils/colorScaleUtil';
-	import { reactiveQueryArgs } from '$lib/utils/queryUtils.svelte';
-	import { useStationsSnapshotConfig } from '$lib/utils/useStationsSnapshot';
+	import { LL, locale } from '#i18n/i18n-svelte.js';
+	import type { StationsGeoJSONType } from '#lib/stores/mapData.js';
+	import { toggleStationSelection, useStations } from '#lib/stores/stationsStore.js';
+	import { unit, unitLabel, unitOnly, unitWithMinMaxAvg } from '#lib/stores/uiStore.js';
+	import { getColorScaleValue } from '#lib/utils/colorScaleUtil.js';
+	import { useStationsSnapshotConfig } from '#lib/utils/useStationsSnapshot.js';
 	import { createQuery } from '@tanstack/svelte-query';
-	import HealthRiskPill from 'components/HealthRiskPill.svelte';
+	import HealthRiskPill from '#lib/components/HealthRiskPill.svelte';
 	import { mode } from 'mode-watcher';
 	import { GeoJSON, CircleLayer, Popup } from 'svelte-maplibre';
 	import { TinyColor } from '@ctrl/tinycolor';
+	import type { Map as MapLibreMap } from 'maplibre-gl';
 
 	interface Props {
 		stations: StationsGeoJSONType;
 		initialStationIds?: string[];
-		map: maplibregl.Map;
+		map: MapLibreMap;
 	}
 
 	let { stations, initialStationIds = [] }: Props = $props();
 
+	// svelte-ignore state_referenced_locally
 	const selectedStations = useStations({ initialStationIds, stations });
 	const stationsSnapshotQueryConfig = $derived.by(() =>
 		useStationsSnapshotConfig({ initialStationIds, stations })
 	);
-	const snapshotQuery = createQuery(reactiveQueryArgs(() => $stationsSnapshotQueryConfig));
-	const apiResponseData = $derived($snapshotQuery.data?.items || []);
+	const snapshotQuery = createQuery(() => $stationsSnapshotQueryConfig);
+	const apiResponseData = $derived(snapshotQuery.data?.items || []);
 
 	const idToItemMap = $derived.by(() => {
 		return apiResponseData.reduce(
@@ -43,9 +44,9 @@
 	});
 
 	const COLORS = $derived({
-		MUTED_FG: $mode === 'dark' ? '#677489' : '#97a3b6',
-		BG: $mode === 'dark' ? '#1e293b' : '#ffffff',
-		FG: $mode === 'dark' ? '#ffffff' : '#1e293b'
+		MUTED_FG: mode.current === 'dark' ? '#677489' : '#97a3b6',
+		BG: mode.current === 'dark' ? '#1e293b' : '#ffffff',
+		FG: mode.current === 'dark' ? '#ffffff' : '#1e293b'
 	});
 
 	const stationsWithColors = $derived({
@@ -56,8 +57,8 @@
 				unit: $unit,
 				LL: $LL,
 				value: getValueById(station.properties?.id) as number | string,
-				min: $snapshotQuery.data?.scaleMin ?? null,
-				max: $snapshotQuery.data?.scaleMax ?? null
+				min: snapshotQuery.data?.scaleMin ?? null,
+				max: snapshotQuery.data?.scaleMax ?? null
 			});
 			let borderColor = 'black';
 			let bgOpacity = 1;
@@ -71,14 +72,20 @@
 			const tinyMuted = new TinyColor(COLORS.MUTED_FG);
 			if (value && color === 'hsl(var(--muted-foreground))') {
 				color =
-					$mode === 'dark' ? tinyMuted.lighten(15).toString() : tinyMuted.darken(15).toString();
+					mode.current === 'dark'
+						? tinyMuted.lighten(15).toString()
+						: tinyMuted.darken(15).toString();
 				borderColor =
-					$mode === 'dark' ? tinyMuted.lighten(25).toString() : tinyMuted.darken(25).toString();
+					mode.current === 'dark'
+						? tinyMuted.lighten(25).toString()
+						: tinyMuted.darken(25).toString();
 				bgOpacity = 1;
 			} else if (isUnsupported) {
 				color = COLORS.MUTED_FG;
 				borderColor =
-					$mode === 'dark' ? tinyMuted.lighten(15).toString() : tinyMuted.darken(15).toString();
+					mode.current === 'dark'
+						? tinyMuted.lighten(15).toString()
+						: tinyMuted.darken(15).toString();
 				bgOpacity = 0.5;
 			} else if (isUnavailable) {
 				color = COLORS.MUTED_FG;
@@ -121,17 +128,6 @@
 	/>
 </GeoJSON>
 
-<GeoJSON id="selected-stations" data={selectedStationsGeoJSON} promoteId="id">
-	<CircleLayer
-		paint={{
-			'circle-color': 'transparent',
-			'circle-radius': 8,
-			'circle-stroke-color': COLORS.FG,
-			'circle-stroke-width': 2
-		}}
-	/>
-</GeoJSON>
-
 <GeoJSON id="stations" data={stationsWithColors} promoteId="id">
 	<CircleLayer
 		interactive
@@ -157,7 +153,7 @@
 				{@const value = getValueById(props.id)}
 				{@const type = props.stationType === 'temprh' ? 'temprh' : 'biomet'}
 				<div class="relative flex flex-col">
-					<h3 class="text-sm font-bold leading-4">{props.longName}</h3>
+					<h3 class="text-sm leading-4 font-bold">{props.longName}</h3>
 					<div class="mb-2 border-b border-border pb-1 text-xs text-muted-foreground">
 						{$LL.pages.stations.table.cells.stationTypes[type]()}
 					</div>
@@ -193,4 +189,19 @@
 			{/snippet}
 		</Popup>
 	</CircleLayer>
+</GeoJSON>
+
+<!-- after the stations: svelte-maplibre adds the layers in this order, and neighbouring stations
+must not cover the ring. Not interactive: the popups of the stations open only on the topmost
+interactive layer -->
+<GeoJSON id="selected-stations" data={selectedStationsGeoJSON} promoteId="id">
+	<CircleLayer
+		interactive={false}
+		paint={{
+			'circle-color': 'transparent',
+			'circle-radius': 8,
+			'circle-stroke-color': COLORS.FG,
+			'circle-stroke-width': 2
+		}}
+	/>
 </GeoJSON>

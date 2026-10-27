@@ -1,23 +1,28 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { LL, locale } from '$i18n/i18n-svelte';
-	import type { TranslationFunctions } from '$i18n/i18n-types';
-	import { Button } from '$lib/components/ui/button';
-	import * as Popover from '$lib/components/ui/popover';
+	import { LL, locale } from '#i18n/i18n-svelte.js';
+	import type { TranslationFunctions } from '#i18n/i18n-types.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import * as Popover from '#lib/components/ui/popover/index.js';
 	import {
 		PopoverTooltip,
 		PopoverTooltipContent,
 		PopoverTooltipTrigger
-	} from '$lib/components/ui/popover-tooltip';
-	import type { StationsGeoJSONType } from '$lib/stores/mapData';
-	import { dayValue, heatStressUnit, hour, isLeftSidebarOpened, unit } from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
-	import { api } from '$lib/utils/api';
-	import { getColorsByUnit, getColorStops, unitsToScalesMap } from '$lib/utils/colorScaleUtil';
-	import { today } from '$lib/utils/dateUtil';
-	import { getHealthRisksByUnit, isHealthRiskUnit } from '$lib/utils/healthRisksUtil';
-	import { reactiveQueryArgs } from '$lib/utils/queryUtils.svelte';
-	import { useStationsSnapshotConfig } from '$lib/utils/useStationsSnapshot';
+	} from '#lib/components/ui/popover-tooltip/index.js';
+	import type { StationsGeoJSONType } from '#lib/stores/mapData.js';
+	import {
+		dayValue,
+		heatStressUnit,
+		hour,
+		isLeftSidebarOpened,
+		unit
+	} from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
+	import { api } from '#lib/utils/api.js';
+	import { getColorsByUnit, getColorStops, unitsToScalesMap } from '#lib/utils/colorScaleUtil.js';
+	import { today } from '#lib/utils/dateUtil.js';
+	import { getHealthRisksByUnit, isHealthRiskUnit } from '#lib/utils/healthRisksUtil.js';
+	import { useStationsSnapshotConfig } from '#lib/utils/useStationsSnapshot.js';
 	import { createQuery, type QueryKey, type QueryOptions } from '@tanstack/svelte-query';
 	import { scaleLinear } from 'd3-scale';
 	import {
@@ -31,9 +36,9 @@
 		setYear,
 		startOfYear
 	} from 'date-fns';
-	import { HeartPulse, X } from 'lucide-svelte';
+	import { HeartPulse, X } from '@lucide/svelte';
 	import HealthRiskPill from './HealthRiskPill.svelte';
-	import { PUBLIC_ENABLE_HEATATLAS_TIMESLIDER } from '$env/static/public';
+	import { PUBLIC_ENABLE_HEATATLAS_TIMESLIDER } from '$app/env/public';
 
 	// Props
 	interface Props {
@@ -74,10 +79,10 @@
 	const stationsSnapshotQueryConfig = $derived.by(() =>
 		useStationsSnapshotConfig({ initialStationIds, stations })
 	);
-	const snapshotQuery = createQuery(reactiveQueryArgs(() => $stationsSnapshotQueryConfig));
+	const snapshotQuery = createQuery(() => $stationsSnapshotQueryConfig);
 
-	const scaleMin = $derived($snapshotQuery.data?.scaleMin ?? 0);
-	const scaleMax = $derived($snapshotQuery.data?.scaleMax ?? 100);
+	const scaleMin = $derived(snapshotQuery.data?.scaleMin ?? 0);
+	const scaleMax = $derived(snapshotQuery.data?.scaleMax ?? 100);
 
 	let customGradient = $derived.by(() => {
 		const stops = getColorStops({
@@ -96,18 +101,16 @@
 
 	const showTimeslider = PUBLIC_ENABLE_HEATATLAS_TIMESLIDER === 'true';
 	const queryKey = $derived(['lastAvailableRasterLayer', $heatStressUnit, getYear(today())]);
-	const lastAvailableRasterLayerQuery = createQuery(
-		reactiveQueryArgs(() => ({
-			queryKey,
-			queryFn: async ({ queryKey }: QueryOptions<QueryKey>) => {
-				const [, param, year] = queryKey as [string, string, number];
-				return api().getLatestRasterData({ year, param });
-			},
-			enabled: !showTimeslider,
-			staleTime: Infinity,
-			cacheTime: Infinity
-		}))
-	);
+	const lastAvailableRasterLayerQuery = createQuery(() => ({
+		queryKey,
+		queryFn: async ({ queryKey }: QueryOptions<QueryKey>) => {
+			const [, param, year] = queryKey as [string, string, number];
+			return api().getLatestRasterData({ year, param });
+		},
+		enabled: !showTimeslider,
+		staleTime: Infinity,
+		cacheTime: Infinity
+	}));
 	const finalLocalDate = $derived.by(() => {
 		// When timeslider is enabled, use the timeslider values
 		if (showTimeslider) {
@@ -120,11 +123,11 @@
 
 		// When timeslider is disabled, use API data
 		const config = {
-			doy: $lastAvailableRasterLayerQuery.data?.doy ?? getDayOfYear(today()),
+			doy: lastAvailableRasterLayerQuery.data?.doy ?? getDayOfYear(today()),
 			hour:
-				$lastAvailableRasterLayerQuery.data?.hour ??
+				lastAvailableRasterLayerQuery.data?.hour ??
 				getHours(addHours($hour, today().getTimezoneOffset() / 60)),
-			year: $lastAvailableRasterLayerQuery.data?.year ?? getYear(today()),
+			year: lastAvailableRasterLayerQuery.data?.year ?? getYear(today()),
 			param: $heatStressUnit.toUpperCase()
 		};
 		const yearStart = startOfYear(setYear(today(), config.year));
@@ -134,53 +137,51 @@
 		return date;
 	});
 	const dateKey = $derived(format(finalLocalDate, 'yyyy-MM-dd-HH'));
-	const heatStressGradientquery = createQuery(
-		reactiveQueryArgs(() => ({
-			queryKey: ['heatStressGradient', dateKey, $heatStressUnit],
-			queryFn: async () => {
-				const metadata = await api().getHeatStressMetadata({
-					date: finalLocalDate,
-					unit: $heatStressUnit
-				});
-				let cmap = 'turbo';
-				if ($heatStressUnit === 'relative_humidity') {
-					cmap = 'ylgnbu';
-				} else if ($heatStressUnit === 'air_temperature') {
-					cmap = 'spectral_r';
-				}
-				let colormap = await api().getHeatStressColormap({
-					rangeStart: metadata?.range[0] || 0,
-					rangeEnd: metadata?.range[1] || 100,
-					cmap: cmap
-				});
-				if (!colormap)
-					return {
-						colormap: [],
-						metadata
-					};
-				const colormapScale = scaleLinear()
-					.domain([
-						Math.min(...colormap.map(({ value }) => value)),
-						Math.max(...colormap.map(({ value }) => value))
-					])
-					.range([0, 100]);
+	const heatStressGradientquery = createQuery(() => ({
+		queryKey: ['heatStressGradient', dateKey, $heatStressUnit],
+		queryFn: async () => {
+			const metadata = await api().getHeatStressMetadata({
+				date: finalLocalDate,
+				unit: $heatStressUnit
+			});
+			let cmap = 'turbo';
+			if ($heatStressUnit === 'relative_humidity') {
+				cmap = 'ylgnbu';
+			} else if ($heatStressUnit === 'air_temperature') {
+				cmap = 'spectral_r';
+			}
+			let colormap = await api().getHeatStressColormap({
+				rangeStart: metadata?.range[0] || 0,
+				rangeEnd: metadata?.range[1] || 100,
+				cmap
+			});
+			if (!colormap)
 				return {
-					colormap: [...new Set(colormap)].map(({ value, rgba }) => ({
-						value: colormapScale(value),
-						rgb: [rgba[0], rgba[1], rgba[2]]
-					})),
+					colormap: [],
 					metadata
 				};
-			},
-			enabled: isHeatStressPage && (showTimeslider || $lastAvailableRasterLayerQuery.isSuccess),
-			staleTime: Infinity,
-			cacheTime: Infinity
-		}))
-	);
+			const colormapScale = scaleLinear()
+				.domain([
+					Math.min(...colormap.map(({ value }) => value)),
+					Math.max(...colormap.map(({ value }) => value))
+				])
+				.range([0, 100]);
+			return {
+				colormap: [...new Set(colormap)].map(({ value, rgba }) => ({
+					value: colormapScale(value),
+					rgb: [rgba[0], rgba[1], rgba[2]]
+				})),
+				metadata
+			};
+		},
+		enabled: isHeatStressPage && (showTimeslider || lastAvailableRasterLayerQuery.isSuccess),
+		staleTime: Infinity,
+		cacheTime: Infinity
+	}));
 
 	const heatStressGradient = $derived.by(() => {
-		if (!isHeatStressPage || !$heatStressGradientquery.data?.colormap.length) return null;
-		const stops = $heatStressGradientquery.data.colormap.map(
+		if (!isHeatStressPage || !heatStressGradientquery.data?.colormap.length) return null;
+		const stops = heatStressGradientquery.data.colormap.map(
 			({ value, rgb }) => `rgb(${rgb.join(', ')}) ${value}%`
 		);
 		return `linear-gradient(to right, ${stops.join(', ')})`;
@@ -190,18 +191,18 @@
 		return `${Math.round(val).toLocaleString($locale)} ${labels.unitOnlyLabel}`;
 	});
 	const minLabel = $derived.by(() => {
-		if ($heatStressGradientquery.isLoading || $snapshotQuery.isLoading) return '...';
+		if (heatStressGradientquery.isLoading || snapshotQuery.isLoading) return '...';
 		if (isHeatStressPage) {
-			const min = $heatStressGradientquery.data?.metadata?.range[0];
+			const min = heatStressGradientquery.data?.metadata?.range[0];
 			return min ? formatValue(min) : '';
 		}
 		return !isOrdinalUnit && typeof scaleMin === 'number' ? formatValue(scaleMin) : '';
 	});
 	const maxLabel = $derived.by(() => {
-		if ($heatStressGradientquery.isLoading && isHeatStressPage) return '...';
-		if ($snapshotQuery.isLoading && !isHeatStressPage) return '...';
+		if (heatStressGradientquery.isLoading && isHeatStressPage) return '...';
+		if (snapshotQuery.isLoading && !isHeatStressPage) return '...';
 		if (isHeatStressPage) {
-			const max = $heatStressGradientquery.data?.metadata?.range[1];
+			const max = heatStressGradientquery.data?.metadata?.range[1];
 			return max ? formatValue(max) : '';
 		}
 		return !isOrdinalUnit && typeof scaleMax === 'number' ? formatValue(scaleMax) : '';
@@ -213,7 +214,7 @@
 		'flex w-72 flex-col gap-2 bg-background/80 text-sm backdrop-blur-[2px]',
 		'fixed bottom-4 left-4 z-10 overflow-clip rounded border border-border shadow-lg dark:shadow-black/80',
 		showLeftSidebar
-			? 'opacity-0 sm:translate-x-[var(--leftSidebarWidth)] sm:opacity-100'
+			? 'opacity-0 sm:translate-x-(--leftSidebarWidth) sm:opacity-100'
 			: 'translate-x-0',
 		'p-4 transition duration-300 ease-in-out',
 		'[&:has(input:focus-visible)]:ring-2 [&:has(input:focus-visible)]:ring-ring',
@@ -231,19 +232,19 @@
 						<PopoverTooltip openDelay={0} closeDelay={0} disableHoverableContent>
 							<PopoverTooltipTrigger
 								class={cn(
-									'focusable size-full',
+									'size-full focusable',
 									'transition-opacity hover-hover:group-has-[button:hover]:opacity-20 hover-hover:group-has-[button:hover]:hover:opacity-100'
 								)}
 								style={`background-color: ${color}`}
 							/>
 							<PopoverTooltipContent
-								class={cn('flex w-96 max-w-full flex-col gap-1 px-4 pb-4 pt-3 leading-tight')}
+								class={cn('flex w-96 max-w-full flex-col gap-1 px-4 pt-3 pb-4 leading-tight')}
 							>
 								{#if healthRisks[i]}
 									<strong class="flex gap-2 font-semibold">
 										<span>{healthRisks[i].title}</span>
 										{#if healthRisks[i].ranges}
-											<span class="whitespace-nowrap font-normal text-muted-foreground">
+											<span class="font-normal whitespace-nowrap text-muted-foreground">
 												({healthRisks[i].ranges})
 											</span>
 										{/if}
@@ -259,14 +260,14 @@
 					class="h-4 w-full max-w-96 rounded-sm bg-muted shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]"
 					style={cn(
 						isHeatStressPage &&
-							!$heatStressGradientquery.isLoading &&
+							!heatStressGradientquery.isLoading &&
 							!isOrdinalUnit &&
 							`background-image: ${heatStressGradient};`,
 						!isHeatStressPage &&
-							!$snapshotQuery.isLoading &&
+							!snapshotQuery.isLoading &&
 							!isOrdinalUnit &&
 							`background-image: ${customGradient};`,
-						($heatStressGradientquery.isLoading || $snapshotQuery.isLoading || isOrdinalUnit) &&
+						(heatStressGradientquery.isLoading || snapshotQuery.isLoading || isOrdinalUnit) &&
 							'animate-pulse'
 					)}
 				></div>
@@ -274,21 +275,19 @@
 			<div
 				class={cn(
 					'flex w-full items-center justify-between pt-1 text-xs leading-4 text-muted-foreground',
-					$heatStressGradientquery.isLoading && !isOrdinalUnit && 'animate-pulse'
+					heatStressGradientquery.isLoading && !isOrdinalUnit && 'animate-pulse'
 				)}
 			>
 				<span
 					class={cn(
-						$heatStressGradientquery.isLoading && !isOrdinalUnit && '-translate-y-1/3 animate-pulse'
+						heatStressGradientquery.isLoading && !isOrdinalUnit && '-translate-y-1/3 animate-pulse'
 					)}
 				>
 					{isOrdinalUnit ? healthRisks[0].title : minLabel}
 				</span>
 				<span
 					class={cn(
-						$heatStressGradientquery.isLoading &&
-							!isOrdinalUnit &&
-							'-translate-y-1/3 animate-pulse',
+						heatStressGradientquery.isLoading && !isOrdinalUnit && '-translate-y-1/3 animate-pulse',
 						'text-right'
 					)}
 				>
@@ -304,9 +303,11 @@
 					<HealthRiskPill value={123} withLabel {stations} {initialStationIds} />
 				</span>
 			{/if}
+
 			<span class="inline-grid grid-cols-[0.75rem_1fr] items-center gap-2">
 				<HealthRiskPill value={undefined} withLabel {stations} {initialStationIds} />
 			</span>
+
 			<span class="mb-1 inline-grid grid-cols-[0.75rem_1fr] items-center gap-2">
 				<HealthRiskPill value={null} withLabel {stations} {initialStationIds} />
 			</span>
@@ -314,10 +315,10 @@
 	{/if}
 	{#if isHealthUnit}
 		<Popover.Root bind:open>
-			<Popover.Trigger asChild>
-				{#snippet children({ builder })}
+			<Popover.Trigger>
+				{#snippet child({ props })}
 					<Button
-						builders={[builder]}
+						{...props}
 						variant="link"
 						role="combobox"
 						aria-expanded={open}
@@ -333,7 +334,7 @@
 				{/snippet}
 			</Popover.Trigger>
 			<Popover.Content
-				class="max-h-[calc(100vh-20rem)] w-72 -translate-y-[7.5rem] overflow-y-auto rounded p-0 pb-2"
+				class="max-h-[calc(100vh-20rem)] w-72 -translate-y-30 overflow-y-auto rounded p-0 pb-2"
 			>
 				<strong
 					class={cn(
@@ -343,9 +344,10 @@
 				>
 					<HeartPulse class="size-5 text-pink-700" />
 					<span>{$LL.map.choroplethLegend.title()}</span>
-					<Button variant="ghost" size="icon" class="size-5 p-0" on:click={() => (open = false)}>
-						<X class="size-5 text-muted-foreground" />
-					</Button>
+
+					<Button variant="ghost" size="icon" class="size-5 p-0" onclick={() => (open = false)}
+						><X class="size-5 text-muted-foreground" /></Button
+					>
 				</strong>
 				<ul class="flex flex-col p-4 text-sm">
 					{#each healthRisks.toReversed() as { title, description, ranges }, i}

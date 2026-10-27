@@ -4,7 +4,7 @@ import { render } from 'vitest-browser-svelte';
 import ChartExportDropdown from './ChartExportDropdown.svelte';
 
 const html2canvas = vi.hoisted(() => vi.fn(async () => document.createElement('canvas')));
-vi.mock('html2canvas', () => ({ default: html2canvas }));
+vi.mock('html2canvas-pro', () => ({ default: html2canvas }));
 
 async function exportChart(screen: Awaited<ReturnType<typeof render>>) {
 	// the trigger wraps a button

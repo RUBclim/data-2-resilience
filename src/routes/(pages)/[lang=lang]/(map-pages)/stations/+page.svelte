@@ -1,10 +1,10 @@
 <script lang="ts">
-	import LL from '$i18n/i18n-svelte';
-	import airTemperatureAndHumiditySensor from '$lib/assets/air-temperature-humidity-sensor.png';
-	import weatherStation from '$lib/assets/weather-station.png';
-	import CollapsibleParagraph from 'components/CollapsibleParagraph.svelte';
-	import SensorDescription from 'components/SensorDescription.svelte';
-	import StationsSelectionSection from 'components/StationsSelectionSection.svelte';
+	import LL from '#i18n/i18n-svelte.js';
+	import airTemperatureAndHumiditySensor from '#lib/assets/air-temperature-humidity-sensor.png';
+	import weatherStation from '#lib/assets/weather-station.png';
+	import CollapsibleParagraph from '#lib/components/CollapsibleParagraph.svelte';
+	import SensorDescription from '#lib/components/SensorDescription.svelte';
+	import StationsSelectionSection from '#lib/components/StationsSelectionSection.svelte';
 </script>
 
 <h1 class="mb-2 text-xl font-semibold">{$LL.pages.stations.title()}</h1>

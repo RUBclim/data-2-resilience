@@ -1,5 +1,5 @@
-import type { StationsGeoJSONType } from '$lib/stores/mapData';
-import { LL } from '$lib/test-utils/i18n';
+import type { StationsGeoJSONType } from '#lib/stores/mapData.js';
+import { LL } from '#lib/test-utils/i18n.js';
 import { describe, expect, it } from 'vitest';
 import {
 	getMessageForUnavailableStations,

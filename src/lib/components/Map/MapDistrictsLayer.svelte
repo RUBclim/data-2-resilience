@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { LL } from '$i18n/i18n-svelte';
-	import { districts } from '$lib/stores/mapData';
+	import { LL } from '#i18n/i18n-svelte.js';
+	import { districts } from '#lib/stores/mapData.js';
 	import { mode } from 'mode-watcher';
 	import { FillLayer, GeoJSON, LineLayer, Popup } from 'svelte-maplibre';
-	import { addPopup } from '$lib/stores/mapPopupsStore.svelte';
+	import { addPopup } from '#lib/stores/mapPopupsStore.svelte.js';
 
 	interface Props {
 		visible?: boolean;
@@ -42,7 +42,7 @@
 			visibility: visible ? 'visible' : 'none'
 		}}
 		paint={{
-			'line-color': $mode === 'dark' ? 'black' : 'white',
+			'line-color': mode.current === 'dark' ? 'black' : 'white',
 			'line-opacity': 1,
 			'line-width': displayMode === 'fill' ? 1 : 6
 		}}
@@ -54,7 +54,7 @@
 			visibility: visible ? 'visible' : 'none'
 		}}
 		paint={{
-			'line-color': $mode === 'dark' ? 'white' : 'black',
+			'line-color': mode.current === 'dark' ? 'white' : 'black',
 			'line-opacity': 1,
 			'line-width': displayMode === 'fill' ? 1 : 2
 		}}

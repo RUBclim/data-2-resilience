@@ -1,21 +1,20 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { page } from '$app/stores';
-	import { LL, locale } from '$i18n/i18n-svelte';
+	import { browser } from '$app/env';
+	import { page } from '$app/state';
+	import { LL, locale } from '#i18n/i18n-svelte.js';
 	import {
 		closeLeftSidebar,
 		cycleSidebarState,
 		setLeftSidebarState,
 		sidebarState
-	} from '$lib/stores/uiStore';
-	import { SidebarState } from '$lib/types/sidebar';
-	import { cn } from '$lib/utils';
-	import { SidebarClose, SidebarOpen } from 'lucide-svelte';
+	} from '#lib/stores/uiStore.js';
+	import { SidebarState } from '#lib/types/sidebar.js';
+	import { cn } from '#lib/utils.js';
+	import { SidebarClose, SidebarOpen } from '@lucide/svelte';
 	import { onDestroy, onMount } from 'svelte';
 	import Button from './ui/button/button.svelte';
 
-	const isAboutPage = $derived($page.url.pathname.replace(`/${$locale}`, '') === '/about');
+	const isAboutPage = $derived(page.url.pathname.replace(`/${$locale}`, '') === '/about');
 	const showLeftSidebar = $derived($sidebarState !== SidebarState.CLOSED && !isAboutPage);
 	let isMobile = $state(true);
 	const shouldCloseNext = $derived(
@@ -57,39 +56,42 @@
 	});
 </script>
 
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
+
 <div
 	class={cn(
 		'h-[calc(100vh-var(--headerHeight,5rem))]',
-		'grid grid-cols-[0,1fr] transition-all duration-300 ease-in-out',
-		showLeftSidebar && 'xl:grid-cols-[var(--leftSidebarWidth),1fr]'
+		'grid grid-cols-[0_1fr] transition-all duration-300 ease-in-out',
+		showLeftSidebar && 'xl:grid-cols-[var(--leftSidebarWidth)_1fr]'
 	)}
 >
 	<aside class="relative z-50">
 		<div
 			class={cn(
 				'border-r border-border bg-background',
-				'flex min-h-full w-[var(--leftSidebarWidth)] flex-col gap-4',
+				'flex min-h-full w-(--leftSidebarWidth) flex-col gap-4',
 				'transition-all duration-300 ease-in-out',
-				'absolute left-0 top-0 z-50',
+				'absolute top-0 left-0 z-50',
 				showLeftSidebar
 					? 'translate-x-0 opacity-100 shadow-2xl'
-					: '-translate-x-[var(--leftSidebarWidth)] shadow-none'
+					: '-translate-x-(--leftSidebarWidth) shadow-none'
 			)}
 		>
 			<div
 				class={cn(
 					'h-[calc(100vh-var(--headerHeight,5rem))]',
-					'w-[var(--leftSidebarWidth)] overflow-y-auto overflow-x-clip',
+					'w-(--leftSidebarWidth) overflow-x-clip overflow-y-auto',
 					'border-r border-border',
 					'transition-all duration-300 ease-in-out'
 				)}
 				id="left-sidebar-wrapper"
 				inert={!showLeftSidebar}
 			>
-				<slot name="left-sidebar" />
+				<slot name="left-sidebar"></slot>
 			</div>
+
 			{#if !isAboutPage}
-				<div class={cn('absolute right-0 top-0 z-50 -translate-y-px translate-x-full')}>
+				<div class={cn('absolute top-0 right-0 z-50 translate-x-full -translate-y-px')}>
 					<div class={cn('group relative')}>
 						<Button
 							size="icon"
@@ -109,9 +111,9 @@
 						<div
 							aria-hidden="true"
 							class={cn(
-								'absolute left-full top-1/2 w-fit max-w-56 -translate-y-1/2 translate-x-2',
-								'whitespace-nowrap border border-border bg-background px-3 py-1.5 shadow-lg',
-								'pointer-events-none rounded-sm opacity-0 hover-hover:group-hover:opacity-100',
+								'absolute top-1/2 left-full w-fit max-w-56 translate-x-2 -translate-y-1/2',
+								'border border-border bg-background px-3 py-1.5 whitespace-nowrap shadow-lg',
+								'pointer-events-none rounded-sm opacity-0 group-hover:opacity-100',
 								'text-sm transition-opacity'
 							)}
 						>
@@ -124,11 +126,13 @@
 			{/if}
 		</div>
 	</aside>
+
 	<main class="relative z-10 h-[calc(100vh-var(--headerHeight,5rem))] overflow-y-auto">
-		<slot />
+		<slot></slot>
+
 		{#if showLeftSidebar}
 			<button
-				class={cn('absolute inset-0 z-50 bg-muted/50 backdrop-blur-sm md:hidden', 'transition-all')}
+				class={cn('absolute inset-0 z-50 bg-muted/50 backdrop-blur-xs md:hidden', 'transition-all')}
 				onclick={closeLeftSidebar}
 				aria-hidden="true"
 			></button>

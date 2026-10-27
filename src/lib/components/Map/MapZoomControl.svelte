@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { LL, locale } from '$i18n/i18n-svelte';
-	import { isLeftSidebarOpened } from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
-	import { Minus, Plus } from 'lucide-svelte';
+	import { LL, locale } from '#i18n/i18n-svelte.js';
+	import { isLeftSidebarOpened } from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
+	import { Minus, Plus } from '@lucide/svelte';
 	import type { Map as MapLibreMap } from 'maplibre-gl';
 	import { Button } from '../ui/button';
 
@@ -13,6 +13,7 @@
 
 	let { map }: Props = $props();
 
+	// svelte-ignore state_referenced_locally
 	let maxZoomReached = $state(map?.getZoom() >= map?.getMaxZoom());
 	let zoomInitialized = false;
 
@@ -36,7 +37,7 @@
 <nav
 	aria-label={$LL.map.zoom.navAlt()}
 	class={cn(
-		'fixed right-4 top-[calc(var(--headerHeight,5rem)+1rem)] z-50 flex flex-col gap-px',
+		'fixed top-[calc(var(--headerHeight,5rem)+1rem)] right-4 z-50 flex flex-col gap-px',
 		'w-10 rounded-md border border-border bg-border',
 		'shadow-lg transition duration-300 ease-in-out dark:shadow-black/80',
 		showLeftSidebar && 'max-sm:pointer-events-none max-sm:opacity-0'
@@ -52,7 +53,7 @@
 			'p-0'
 		)}
 		disabled={maxZoomReached}
-		on:click={() => map.zoomIn()}
+		onclick={() => map.zoomIn()}
 	>
 		<Plus class="size-5" />
 	</Button>
@@ -65,7 +66,7 @@
 			'focusable focus-visible:z-50 focus-visible:rounded',
 			'p-0'
 		)}
-		on:click={() => map.zoomOut()}
+		onclick={() => map.zoomOut()}
 	>
 		<Minus class="size-5" />
 	</Button>

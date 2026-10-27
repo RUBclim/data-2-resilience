@@ -1,4 +1,4 @@
-import type { TranslationFunctions } from '$i18n/i18n-types';
+import type { TranslationFunctions } from '#i18n/i18n-types.js';
 import { interpolateRgb, quantize } from 'd3-interpolate';
 import { scaleLinear, scaleOrdinal, scaleSequential } from 'd3-scale';
 import {

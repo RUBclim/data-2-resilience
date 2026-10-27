@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { LL } from '$i18n/i18n-svelte';
-	import { type StationsGeoJSONType } from '$lib/stores/mapData';
-	import { useStations } from '$lib/stores/stationsStore';
+	import { LL } from '#i18n/i18n-svelte.js';
+	import { type StationsGeoJSONType } from '#lib/stores/mapData.js';
+	import { useStations } from '#lib/stores/stationsStore.js';
 	import {
 		formattedTimeConfiguration,
 		rangeEndDate,
@@ -11,20 +11,19 @@
 		unit,
 		unitLabel,
 		unitOnly
-	} from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
-	import { reactiveQueryArgs } from '$lib/utils/queryUtils.svelte';
+	} from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
 	import {
 		getMessageForUnavailableStations,
 		getMessageForUnsupportedStations
-	} from '$lib/utils/stationsDataVisUtil';
-	import { useStationsSnapshotConfig } from '$lib/utils/useStationsSnapshot';
+	} from '#lib/utils/stationsDataVisUtil.js';
+	import { useStationsSnapshotConfig } from '#lib/utils/useStationsSnapshot.js';
 	import { createQuery } from '@tanstack/svelte-query';
-	import ChartExportDropdown from 'components/ChartExportDropdown.svelte';
-	import TimeseriesLineChart from 'components/TimeseriesLineChart.svelte';
-	import Alert from 'components/ui/alert/alert.svelte';
-	import WindDirectionChart from 'components/WindDirectionChart.svelte';
-	import { TriangleAlert } from 'lucide-svelte';
+	import ChartExportDropdown from '#lib/components/ChartExportDropdown.svelte';
+	import TimeseriesLineChart from '#lib/components/TimeseriesLineChart.svelte';
+	import Alert from '#lib/components/ui/alert/alert.svelte';
+	import WindDirectionChart from '#lib/components/WindDirectionChart.svelte';
+	import { TriangleAlert } from '@lucide/svelte';
 	import { getStationDataFetcher } from './stationsLineChartUtil';
 
 	interface Props {
@@ -36,6 +35,7 @@
 
 	let isExporting = $state(false);
 
+	// svelte-ignore state_referenced_locally
 	const ids = useStations({ stations, initialStationIds });
 
 	type DataRecord = Record<string, string | number> & {
@@ -45,7 +45,7 @@
 	const stationsSnapshotQueryConfig = $derived.by(() =>
 		useStationsSnapshotConfig({ initialStationIds, stations })
 	);
-	const snapshotQuery = createQuery(reactiveQueryArgs(() => $stationsSnapshotQueryConfig));
+	const snapshotQuery = createQuery(() => $stationsSnapshotQueryConfig);
 	const queryFn = $derived.by(() =>
 		getStationDataFetcher({
 			ids: $ids,
@@ -55,21 +55,19 @@
 			stations: stations.features
 		})
 	);
-	let query = createQuery(
-		reactiveQueryArgs(() => ({
-			queryKey: ['stationsData-range', $ids?.join('-'), $rangeStartKey, $rangeEndKey, $unit],
-			queryFn,
-			enabled: Boolean(
-				$ids?.length > 0 &&
-					stations?.features?.length > 0 &&
-					$rangeStartDate &&
-					$rangeEndDate &&
-					$unit
-			)
-		}))
-	);
-	const { data: queryData, error } = $derived($query);
-	const isLoading = $derived($query.isLoading || isExporting);
+	let query = createQuery(() => ({
+		queryKey: ['stationsData-range', $ids?.join('-'), $rangeStartKey, $rangeEndKey, $unit],
+		queryFn,
+		enabled: Boolean(
+			$ids?.length > 0 &&
+			stations?.features?.length > 0 &&
+			$rangeStartDate &&
+			$rangeEndDate &&
+			$unit
+		)
+	}));
+	const { data: queryData, error } = $derived(query);
+	const isLoading = $derived(query.isLoading || isExporting);
 	const data = $derived((queryData?.lineChartData as unknown as DataRecord[]) || []);
 	const isOrdinal = $derived($unit.endsWith('_category'));
 	const unsupportedMsg = $derived(
@@ -133,7 +131,7 @@
 		{isOrdinal}
 		{isLoading}
 		{error}
-		min={$snapshotQuery.data?.scaleMin ?? null}
-		max={$snapshotQuery.data?.scaleMax ?? null}
+		min={snapshotQuery.data?.scaleMin ?? null}
+		max={snapshotQuery.data?.scaleMax ?? null}
 	/>
 {/if}

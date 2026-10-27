@@ -1,4 +1,4 @@
-import { LL } from '$lib/test-utils/i18n';
+import { LL } from '#lib/test-utils/i18n.js';
 import { describe, expect, it } from 'vitest';
 import {
 	computeColormapRanges,

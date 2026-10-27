@@ -1,17 +1,16 @@
 <script lang="ts">
-	import { PUBLIC_ENABLE_HEATATLAS_TIMESLIDER } from '$env/static/public';
-	import { LL, locale } from '$i18n/i18n-svelte';
-	import { dayValue, heatStressUnit, hour, udpateDay } from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
-	import { api } from '$lib/utils/api';
-	import { isToday, today } from '$lib/utils/dateUtil';
-	import { reactiveQueryArgs } from '$lib/utils/queryUtils.svelte';
+	import { PUBLIC_ENABLE_HEATATLAS_TIMESLIDER } from '$app/env/public';
+	import { LL, locale } from '#i18n/i18n-svelte.js';
+	import { dayValue, heatStressUnit, hour, udpateDay } from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
+	import { api } from '#lib/utils/api.js';
+	import { isToday, today } from '#lib/utils/dateUtil.js';
 	import { createQuery, type QueryKey, type QueryOptions } from '@tanstack/svelte-query';
-	import CollapsibleParagraph from 'components/CollapsibleParagraph.svelte';
-	import HourInput from 'components/HourInput.svelte';
-	import InfoTooltip from 'components/InfoTooltip.svelte';
-	import ThermalCompfortNavItem from 'components/ThermalCompfortNavItem.svelte';
-	import { Alert, AlertDescription, AlertTitle } from 'components/ui/alert';
+	import CollapsibleParagraph from '#lib/components/CollapsibleParagraph.svelte';
+	import HourInput from '#lib/components/HourInput.svelte';
+	import InfoTooltip from '#lib/components/InfoTooltip.svelte';
+	import ThermalCompfortNavItem from '#lib/components/ThermalCompfortNavItem.svelte';
+	import { Alert, AlertDescription, AlertTitle } from '#lib/components/ui/alert/index.js';
 	import {
 		addDays,
 		addHours,
@@ -29,26 +28,24 @@
 	const showTimeslider = PUBLIC_ENABLE_HEATATLAS_TIMESLIDER === 'true';
 
 	const queryKey = $derived(['lastAvailableRasterLayer', $heatStressUnit, getYear(today())]);
-	const lastAvailableRasterLayerQuery = createQuery(
-		reactiveQueryArgs(() => ({
-			queryKey,
-			queryFn: async ({ queryKey }: QueryOptions<QueryKey>) => {
-				const [, param, year] = queryKey as [string, string, number];
-				return api().getLatestRasterData({ year, param });
-			},
-			enabled: !showTimeslider,
-			staleTime: Infinity,
-			cacheTime: Infinity
-		}))
-	);
+	const lastAvailableRasterLayerQuery = createQuery(() => ({
+		queryKey,
+		queryFn: async ({ queryKey }: QueryOptions<QueryKey>) => {
+			const [, param, year] = queryKey as [string, string, number];
+			return api().getLatestRasterData({ year, param });
+		},
+		enabled: !showTimeslider,
+		staleTime: Infinity,
+		cacheTime: Infinity
+	}));
 
 	const finalLocalDate = $derived.by(() => {
 		const config = {
-			doy: $lastAvailableRasterLayerQuery.data?.doy ?? getDayOfYear(today()),
+			doy: lastAvailableRasterLayerQuery.data?.doy ?? getDayOfYear(today()),
 			hour:
-				$lastAvailableRasterLayerQuery.data?.hour ??
+				lastAvailableRasterLayerQuery.data?.hour ??
 				getHours(addHours($hour, today().getTimezoneOffset() / 60)),
-			year: $lastAvailableRasterLayerQuery.data?.year ?? getYear(today()),
+			year: lastAvailableRasterLayerQuery.data?.year ?? getYear(today()),
 			param: $heatStressUnit.toUpperCase()
 		};
 		const yearStart = startOfYear(setYear(today(), config.year));
@@ -177,8 +174,8 @@
 {#if showTimeslider}
 	<div
 		class={cn(
-			'rounded bg-muted px-4 pb-2 pt-1.5 text-sm font-semibold',
-			'mt-4 grid grid-cols-[1fr,auto] items-center gap-2'
+			'rounded bg-muted px-4 pt-1.5 pb-2 text-sm font-semibold',
+			'mt-4 grid grid-cols-[1fr_auto] items-center gap-2'
 		)}
 		role="alert"
 	>
@@ -201,7 +198,7 @@
 			description={$LL.pages.heatStress.timeRangeAlertTooltipContent()}
 		/>
 	</div>
-{:else if finalLocalDate && $lastAvailableRasterLayerQuery.isSuccess}
+{:else if finalLocalDate && lastAvailableRasterLayerQuery.isSuccess}
 	<Alert
 		variant={singleDateAlertVariant}
 		class={cn('mt-4', singleDateAlertVariant === 'default' && 'bg-muted')}
@@ -274,15 +271,15 @@
 		--range-pip-in-range-text: hsl(var(--muted-foreground));
 	}
 
-	:global(.date-range-slider .rangePips .pip.first > .pipVal) {
+	:global(.date-range-slider .rangePips .rsPip--first > .rsPipVal) {
 		transform: translate(0, 25%);
 	}
 
-	:global(.date-range-slider .rangePips .pip.last > .pipVal) {
+	:global(.date-range-slider .rangePips .rsPip--last > .rsPipVal) {
 		transform: translate(-100%, 25%);
 	}
 
-	:global(.date-range-slider .rangePips .pip.selected .pipVal) {
+	:global(.date-range-slider .rangePips .rsPip.rsSelected .rsPipVal) {
 		top: 0.4em;
 	}
 

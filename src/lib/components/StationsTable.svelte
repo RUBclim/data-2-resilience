@@ -1,25 +1,85 @@
-<script lang="ts">
-	import { LL, locale } from '$i18n/i18n-svelte';
+<script module lang="ts">
+	import { LL, locale } from '#i18n/i18n-svelte.js';
 	import {
-		createSvelteTable,
-		getCoreRowModel,
-		getFilteredRowModel,
-		getPaginationRowModel,
-		getSortedRowModel,
+		columnFilteringFeature,
+		columnVisibilityFeature,
+		createFilteredRowModel,
+		createPaginatedRowModel,
+		createSortedRowModel,
+		createTable,
+		filterFns,
+		globalFilteringFeature,
 		renderComponent,
-		sortingFns,
+		rowPaginationFeature,
+		rowSortingFeature,
+		sortFns,
+		tableFeatures,
 		type ColumnDef,
 		type FilterFn,
 		type OnChangeFn,
-		type PaginationState,
-		type SortingFn,
+		type SortFn,
 		type SortingState
-	} from '$lib/components/table';
-	import { searchQuery, updateSearchQuery } from '$lib/stores/uiStore';
-	import { api } from '$lib/utils/api';
-	import { reactiveQueryArgs } from '$lib/utils/queryUtils.svelte';
-	import type { StationMetadata } from '$lib/utils/schemas';
+	} from '@tanstack/svelte-table';
+	import type { StationMetadata } from '#lib/utils/schemas.js';
 	import { compareItems, rankItem, type RankingInfo } from '@tanstack/match-sorter-utils';
+	import { get } from 'svelte/store';
+
+	const baseFeatures = tableFeatures({
+		columnFilteringFeature,
+		columnVisibilityFeature,
+		globalFilteringFeature,
+		rowSortingFeature,
+		rowPaginationFeature
+	});
+	type Features = typeof baseFeatures;
+
+	const fuzzyFilter: FilterFn<Features, StationMetadata> = (row, columnId, searchTerm, addMeta) => {
+		let value = row.getValue(columnId);
+
+		if (columnId === 'stationType') {
+			value = get(LL).pages.stations.table.cells.stationTypes[value as 'biomet' | 'temprh']();
+		} else if (typeof value === 'number') {
+			value = value.toLocaleString(get(locale));
+		}
+
+		const itemRank = rankItem(value, searchTerm);
+		addMeta?.({ itemRank });
+		return itemRank.passed;
+	};
+
+	const fuzzySort: SortFn<Features, StationMetadata> = (rowA, rowB, columnId) => {
+		let dir = 0;
+		// set by fuzzyFilter through addMeta
+		const rankOf = (row: typeof rowA) =>
+			(row.columnFiltersMeta[columnId] as { itemRank: RankingInfo } | undefined)?.itemRank;
+
+		// Only sort by rank if the column has ranking information
+		const rankA = rankOf(rowA);
+		const rankB = rankOf(rowB);
+		if (rankA && rankB) {
+			dir = compareItems(rankA, rankB);
+		}
+
+		// Provide an alphanumeric fallback for when the item ranks are equal
+		return dir === 0 ? sortFns.alphanumeric(rowA, rowB, columnId) : dir;
+	};
+
+	// v8 bundled all built-in sort and filter functions, and `'auto'` (the default sortFn of the
+	// station type column) only resolves registered ones
+	const features = tableFeatures({
+		...baseFeatures,
+		filteredRowModel: createFilteredRowModel(),
+		sortedRowModel: createSortedRowModel(),
+		paginatedRowModel: createPaginatedRowModel(),
+		filterFns: { ...filterFns, fuzzy: fuzzyFilter },
+		sortFns: { ...sortFns, fuzzy: fuzzySort }
+	});
+	export type StationsTableFeatures = typeof features;
+</script>
+
+<script lang="ts">
+	import { searchQuery, updateSearchQuery } from '#lib/stores/uiStore.js';
+	import { api } from '#lib/utils/api.js';
 	import { createQuery } from '@tanstack/svelte-query';
 	import DataDownloadButtonWithTooltip from './DataDownloadButtonWithTooltip.svelte';
 	import HighlightedSearchQuery from './HighlightedSearchQuery.svelte';
@@ -30,14 +90,12 @@
 
 	let { stations }: { stations: StationMetadata[] } = $props();
 
-	const query = createQuery(
-		reactiveQueryArgs(() => ({
-			queryKey: ['stations'],
-			queryFn: () => api().getStationsMetadata(),
-			initialData: stations
-		}))
-	);
-	let data = $derived($query?.data || []);
+	const query = createQuery(() => ({
+		queryKey: ['stations'],
+		queryFn: () => api().getStationsMetadata(),
+		initialData: stations
+	}));
+	let data = $derived(query?.data || []);
 
 	let columns = [
 		{
@@ -45,16 +103,16 @@
 			accessorKey: 'longName',
 			cell: (info) => {
 				const text = info.getValue() as string;
-				const searchQuery = info.table.getState().globalFilter;
+				const searchQuery = info.table.atoms.globalFilter.get();
 				return renderComponent(HighlightedSearchQuery, { searchQuery, text });
 			},
-			sortingFn: (a, b) => a.original.longName.localeCompare(b.original.longName, $locale)
+			sortFn: (a, b) => a.original.longName.localeCompare(b.original.longName, $locale)
 		},
 		{
 			header: () => $LL.pages.stations.table.headers.stationType(),
 			accessorKey: 'stationType',
 			cell: (info) => {
-				const searchQuery = info.table.getState().globalFilter;
+				const searchQuery = info.table.atoms.globalFilter.get();
 				const text =
 					info.getValue() === 'biomet' || info.getValue() === 'double'
 						? $LL.pages.stations.table.cells.stationTypes.biomet()
@@ -67,10 +125,10 @@
 			accessorKey: 'id',
 			cell: (info) => {
 				const text = info.getValue() as string;
-				const searchQuery = info.table.getState().globalFilter;
+				const searchQuery = info.table.atoms.globalFilter.get();
 				return renderComponent(HighlightedSearchQuery, { searchQuery, text });
 			},
-			sortingFn: (a, b) => a.original.id.localeCompare(b.original.id, $locale)
+			sortFn: (a, b) => a.original.id.localeCompare(b.original.id, $locale)
 		},
 		{
 			header: () => $LL.pages.stations.table.headers.district(),
@@ -79,17 +137,17 @@
 				const postalCode = info.getValue() as string;
 				const val = postalCode || 'unknown';
 				if (val === 'unknown') return '-';
-				const searchQuery = info.table.getState().globalFilter;
+				const searchQuery = info.table.atoms.globalFilter.get();
 				return renderComponent(HighlightedSearchQuery, { searchQuery, text: val });
 			},
-			sortingFn: (a, b) => a.original.district.localeCompare(b.original.district, $locale)
+			sortFn: (a, b) => a.original.district.localeCompare(b.original.district, $locale)
 		},
 		{
 			header: () => $LL.pages.stations.table.headers.geolocation(),
 			accessorKey: 'latitude',
 			cell: (info) => {
 				const { latitude, longitude } = info.row.original;
-				const searchQuery = info.table.getState().globalFilter;
+				const searchQuery = info.table.atoms.globalFilter.get();
 				return renderComponent(SensorCoordinatesWithTooltip, { searchQuery, latitude, longitude });
 			},
 			enableSorting: false
@@ -112,41 +170,9 @@
 			},
 			enableSorting: false
 		}
-	] satisfies ColumnDef<StationMetadata>[];
-
-	const fuzzyFilter: FilterFn<StationMetadata> = (row, columnId, searchTerm, addMeta) => {
-		let value = row.getValue(columnId);
-
-		if (columnId === 'stationType') {
-			value = $LL.pages.stations.table.cells.stationTypes[value as 'biomet' | 'temprh']();
-		} else if (typeof value === 'number') {
-			value = value.toLocaleString($locale);
-		}
-
-		const itemRank = rankItem(value, searchTerm);
-		addMeta({ itemRank });
-		return itemRank.passed;
-	};
-
-	const fuzzySort: SortingFn<StationMetadata> = (rowA, rowB, columnId) => {
-		let dir = 0;
-		// set by fuzzyFilter through addMeta
-		const rankOf = (row: typeof rowA) =>
-			(row.columnFiltersMeta[columnId] as { itemRank: RankingInfo } | undefined)?.itemRank;
-
-		// Only sort by rank if the column has ranking information
-		const rankA = rankOf(rowA);
-		const rankB = rankOf(rowB);
-		if (rankA && rankB) {
-			dir = compareItems(rankA, rankB);
-		}
-
-		// Provide an alphanumeric fallback for when the item ranks are equal
-		return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
-	};
+	] satisfies ColumnDef<StationsTableFeatures, StationMetadata>[];
 
 	let sorting: SortingState = $state([]);
-	let pagination: PaginationState = $state({ pageIndex: 0, pageSize: 13 });
 
 	const setSorting: OnChangeFn<SortingState> = (updater) => {
 		if (updater instanceof Function) {
@@ -156,39 +182,25 @@
 		}
 	};
 
-	const setPagination: OnChangeFn<PaginationState> = (updater) => {
-		if (updater instanceof Function) {
-			pagination = updater(pagination);
-		} else {
-			pagination = updater;
-		}
-	};
-
-	let table = createSvelteTable({
+	let table = createTable({
+		features,
 		get data() {
 			return data || [];
 		},
 		columns,
+		// owned by the table: with a controlled pagination, every page change syncs the options again,
+		// which recomputes the rows and resets the page (`autoResetPageIndex`)
+		initialState: { pagination: { pageIndex: 0, pageSize: 13 } },
 		state: {
 			get sorting() {
 				return sorting;
-			},
-			get pagination() {
-				return pagination;
 			},
 			get globalFilter() {
 				return $searchQuery || undefined;
 			}
 		},
-		getCoreRowModel: getCoreRowModel<StationMetadata>(),
-		getFilteredRowModel: getFilteredRowModel<StationMetadata>(),
-		getSortedRowModel: getSortedRowModel<StationMetadata>(),
-		getPaginationRowModel: getPaginationRowModel<StationMetadata>(),
 		onSortingChange: setSorting,
-		onPaginationChange: setPagination,
-		filterFns: { fuzzy: fuzzyFilter },
-		sortingFns: { fuzzy: fuzzySort },
-		globalFilterFn: fuzzyFilter
+		globalFilterFn: 'fuzzy'
 	});
 </script>
 

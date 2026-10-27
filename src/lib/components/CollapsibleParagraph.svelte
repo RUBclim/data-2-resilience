@@ -1,6 +1,6 @@
 <script lang="ts">
-	import LL from '$i18n/i18n-svelte';
-	import { cn } from '$lib/utils';
+	import LL from '#i18n/i18n-svelte.js';
+	import { cn } from '#lib/utils.js';
 	import { type Snippet } from 'svelte';
 	import { Button } from './ui/button';
 
@@ -21,6 +21,7 @@
 
 	const { children, defaultIsExpanded, className, linesClampedCount }: Props = $props();
 
+	// svelte-ignore state_referenced_locally
 	let isExpanded = $state(defaultIsExpanded ?? false);
 	let isExpandable = $state(true);
 	let contentDiv: HTMLDivElement | null = $state(null);
@@ -80,9 +81,9 @@
 		variant="link"
 		type="button"
 		size="sm"
-		on:click={toggle}
+		onclick={toggle}
 		class={cn(
-			'-ml-3 mt-1 h-fit text-sm font-semibold transition-opacity',
+			'mt-1 -ml-3 h-fit text-sm font-semibold transition-opacity',
 			!isExpanded && 'opacity-90'
 		)}
 	>

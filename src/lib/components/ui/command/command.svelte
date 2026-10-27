@@ -1,22 +1,15 @@
 <script lang="ts">
-	import { Command as CommandPrimitive } from 'cmdk-sv';
-	import { cn } from '$lib/utils.js';
+	import { Command as CommandPrimitive } from 'bits-ui';
+	import { cn } from '#lib/utils.js';
 
-	type $$Props = CommandPrimitive.CommandProps;
-
-	interface Props {
-		value?: $$Props['value'];
-		class?: string | undefined | null;
-		children?: import('svelte').Snippet;
-		[key: string]: any;
-	}
-
+	// `value` may be bound to `undefined` (as with cmdk-sv): bits-ui has a fallback for it, which
+	// svelte doesn't allow for bindings, so it gets the empty string instead
 	let {
-		value = $bindable(undefined),
+		value = $bindable(),
 		class: className = undefined,
 		children,
 		...rest
-	}: Props = $props();
+	}: Omit<CommandPrimitive.RootProps, 'value'> & { value?: string } = $props();
 </script>
 
 <CommandPrimitive.Root
@@ -24,7 +17,7 @@
 		'flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground',
 		className
 	)}
-	bind:value
+	bind:value={() => value ?? '', (newValue) => (value = newValue)}
 	{...rest}
 >
 	{@render children?.()}

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { LL } from '$i18n/i18n-svelte';
-	import { cn } from '$lib/utils';
-	import { LoaderCircle } from 'lucide-svelte';
+	import { LL } from '#i18n/i18n-svelte.js';
+	import { cn } from '#lib/utils.js';
+	import { LoaderCircle } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
 	import ErrorAlert from './ErrorAlert.svelte';
 

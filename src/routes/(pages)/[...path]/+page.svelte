@@ -1,6 +1,6 @@
 <script lang="ts">
-	import LL from '$i18n/i18n-svelte';
-	import ErrorPage from '$lib/components/ErrorPage.svelte';
+	import LL from '#i18n/i18n-svelte.js';
+	import ErrorPage from '#lib/components/ErrorPage.svelte';
 </script>
 
 <ErrorPage

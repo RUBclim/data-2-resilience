@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { LL } from '$i18n/i18n-svelte';
-	import { actionareas } from '$lib/stores/mapData';
-	import { addPopup } from '$lib/stores/mapPopupsStore.svelte';
+	import { LL } from '#i18n/i18n-svelte.js';
+	import { actionareas } from '#lib/stores/mapData.js';
+	import { addPopup } from '#lib/stores/mapPopupsStore.svelte.js';
 	import { FillLayer, GeoJSON, LineLayer, Popup } from 'svelte-maplibre';
 
 	interface Props {

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { LL, locale } from '$i18n/i18n-svelte';
-	import { type StationsGeoJSONType } from '$lib/stores/mapData';
-	import { useStations } from '$lib/stores/stationsStore';
+	import { LL, locale } from '#i18n/i18n-svelte.js';
+	import { type StationsGeoJSONType } from '#lib/stores/mapData.js';
+	import { useStations } from '#lib/stores/stationsStore.js';
 	import {
 		datavisType,
 		formattedTimeConfiguration,
@@ -12,20 +12,19 @@
 		unitOnly,
 		unitWithMinMaxAvg,
 		updateMinMaxAvg
-	} from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
-	import { getColorScaleValue } from '$lib/utils/colorScaleUtil';
-	import { getHealthRiskKeyByValue, isHealthRiskUnit } from '$lib/utils/healthRisksUtil';
-	import { reactiveQueryArgs } from '$lib/utils/queryUtils.svelte';
+	} from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
+	import { getColorScaleValue } from '#lib/utils/colorScaleUtil.js';
+	import { getHealthRiskKeyByValue, isHealthRiskUnit } from '#lib/utils/healthRisksUtil.js';
 	import {
 		getMessageForUnavailableStations,
 		getMessageForUnsupportedStations
-	} from '$lib/utils/stationsDataVisUtil';
-	import { getHeatStressLabel } from '$lib/utils/textUtil';
-	import { useStationsSnapshotConfig } from '$lib/utils/useStationsSnapshot';
+	} from '#lib/utils/stationsDataVisUtil.js';
+	import { getHeatStressLabel } from '#lib/utils/textUtil.js';
+	import { useStationsSnapshotConfig } from '#lib/utils/useStationsSnapshot.js';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { BarChart, Highlight, Tooltip } from 'layerchart';
-	import { TriangleAlert } from 'lucide-svelte';
+	import { TriangleAlert } from '@lucide/svelte';
 	import ChartExportDropdown from './ChartExportDropdown.svelte';
 	import ChartQueryHull from './ChartQueryHull.svelte';
 	import Combobox from './Combobox.svelte';
@@ -43,11 +42,12 @@
 
 	let isExporting = $state(false);
 
+	// svelte-ignore state_referenced_locally
 	const ids = useStations({ initialStationIds, stations });
 	const stationsSnapshotConfig = $derived.by(() =>
 		useStationsSnapshotConfig({ initialStationIds, stations })
 	);
-	const query = createQuery(reactiveQueryArgs(() => $stationsSnapshotConfig));
+	const query = createQuery(() => $stationsSnapshotConfig);
 
 	const getValue = $derived(
 		<T,>(item: Record<string, unknown>) => item[$unitWithMinMaxAvg as keyof typeof item] as T
@@ -57,7 +57,7 @@
 			.map((id) => {
 				const label =
 					stations.features.find((f) => f.properties.id === id)?.properties.longName || id;
-				const item = ($query.data?.items || []).find((d) => d.id === id);
+				const item = (query.data?.items || []).find((d) => d.id === id);
 				if (!item) {
 					return {
 						id,
@@ -124,16 +124,16 @@
 			unit: $unit,
 			LL: $LL,
 			value: val,
-			min: $query.data?.scaleMin ?? null,
-			max: $query.data?.scaleMax ?? null
+			min: query.data?.scaleMin ?? null,
+			max: query.data?.scaleMax ?? null
 		});
 	});
 
 	const isHealthUnit = $derived(isHealthRiskUnit($unit));
 	const healthRisks = $derived($LL.map.choroplethLegend.healthRisks);
-	const isLoading = $derived($query.isLoading || isExporting);
+	const isLoading = $derived(query.isLoading || isExporting);
 	const showChart = $derived(
-		validIds.length > 0 || isLoading || $query.isError || ($query.data?.items || []).length === 0
+		validIds.length > 0 || isLoading || query.isError || (query.data?.items || []).length === 0
 	);
 </script>
 
@@ -196,9 +196,11 @@
 </h3>
 {#if $ids.length === 1 && typeof firstValidValue !== 'undefined' && firstValidValue !== null}
 	<SingleStationDatavis
-		isLoading={$query.isLoading}
+		isLoading={query.isLoading}
 		label={firstValidValueLabel}
 		value={firstValidValue}
+		min={query.data?.scaleMin ?? null}
+		max={query.data?.scaleMax ?? null}
 	/>
 {:else if showChart}
 	{#if $isCategoryUnit}
@@ -206,8 +208,8 @@
 	{:else}
 		<div class={cn('group relative')} style={`height: ${chartHeight}px`}>
 			<ChartQueryHull
-				isSuccess={$query.isSuccess}
-				error={$query.error}
+				isSuccess={query.isSuccess}
+				error={query.error}
 				data={validStations}
 				{isLoading}
 			>
@@ -255,60 +257,62 @@
 						}
 					}}
 				>
-					<svelte:fragment slot="tooltip">
+					{#snippet tooltip()}
 						<Tooltip.Root
-							let:data={d}
 							classes={{
 								...tooltipClasses,
 								root: cn(tooltipClasses.root, 'w-48')
 							}}
 							contained="container"
 							anchor="right"
+							portal={false}
 						>
-							{@const healthRiskKey =
-								isHealthUnit &&
-								getHealthRiskKeyByValue({ value: d.value, unit: $unit as 'utci' | 'pet' })}
-							{@const healthRiskLabel = healthRiskKey
-								? healthRisks[healthRiskKey as keyof typeof healthRisks].title.thermalComfort()
-								: ''}
-							<span class={cn('flex max-w-48 flex-col text-xs')}>
-								{@html unsupportedIds.includes(d.id) || insufficientDataIds.includes(d.id)
-									? ''
-									: `<strong>${d.label}</strong>`}
-								<span
-									class={cn(
-										'flex items-center gap-x-1',
-										!isHealthUnit && 'flex-row-reverse justify-end'
-									)}
-								>
-									{@html cn(
-										d.value !== undefined &&
-											d.value.toLocaleString($locale, {
-												maximumFractionDigits: 1
-											})
-									)}
-									{@html d.value ? $unitOnly : ''}
+							{#snippet children({ data: d })}
+								{@const healthRiskKey =
+									isHealthUnit &&
+									getHealthRiskKeyByValue({ value: d.value, unit: $unit as 'utci' | 'pet' })}
+								{@const healthRiskLabel = healthRiskKey
+									? healthRisks[healthRiskKey as keyof typeof healthRisks].title.thermalComfort()
+									: ''}
+								<span class={cn('flex max-w-48 flex-col text-xs')}>
+									{@html unsupportedIds.includes(d.id) || insufficientDataIds.includes(d.id)
+										? ''
+										: `<strong>${d.label}</strong>`}
 									<span
-										class="inline-block size-2.5 rounded-full shadow-[inset_0_0_0_1px_rgba(0,0,0,0.1)]"
-										style={`background-color: ${heatStressColorByValue(d.value)};`}
-									></span>
-									{#if isHealthUnit}
-										{healthRiskLabel}
-									{/if}
+										class={cn(
+											'flex items-center gap-x-1',
+											!isHealthUnit && 'flex-row-reverse justify-end'
+										)}
+									>
+										{@html cn(
+											d.value !== undefined &&
+												d.value.toLocaleString($locale, {
+													maximumFractionDigits: 1
+												})
+										)}
+										{@html d.value ? $unitOnly : ''}
+										<span
+											class="inline-block size-2.5 rounded-full shadow-[inset_0_0_0_1px_rgba(0,0,0,0.1)]"
+											style={`background-color: ${heatStressColorByValue(d.value)};`}
+										></span>
+										{#if isHealthUnit}
+											{healthRiskLabel}
+										{/if}
+									</span>
 								</span>
-							</span>
+							{/snippet}
 						</Tooltip.Root>
-					</svelte:fragment>
-					<svelte:fragment slot="highlight">
+					{/snippet}
+					{#snippet highlight()}
 						{#each unsupportedDataItems as item}
 							<Highlight
 								lines={{
-									class: 'stroke-foreground/5 stroke-[20] [stroke-dasharray:1000,0]'
+									class: 'stroke-foreground/5 stroke-20 [stroke-dasharray:1000,0]'
 								}}
 								data={item}
 							></Highlight>
 						{/each}
-					</svelte:fragment>
+					{/snippet}
 				</BarChart>
 			</ChartQueryHull>
 		</div>

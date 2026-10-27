@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { LL } from '$i18n/i18n-svelte';
-	import { Frown } from 'lucide-svelte';
+	import { LL } from '#i18n/i18n-svelte.js';
+	import { Frown } from '@lucide/svelte';
 	import { Alert } from './ui/alert';
 
 	interface Props {

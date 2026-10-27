@@ -62,7 +62,7 @@ Various climate indicators can be selected for visualization:
 We use Shepherd.js to provide an interactive guide through the application's features:
 
 ```typescript
-import { createTour } from '$lib/utils/tourUtil';
+import { createTour } from '#lib/utils/tourUtil';
 
 const tour = createTour([
 	{
@@ -88,8 +88,8 @@ const tour = createTour([
 
 Before you begin, ensure you have the following installed:
 
-- [Node.js](https://nodejs.org/) version 22.13.1 or later (as specified in `.nvmrc`)
-- [PNPM](https://pnpm.io/installation) package manager
+- [Node.js](https://nodejs.org/) 24 (as specified in `.nvmrc`)
+- [PNPM](https://pnpm.io/installation) 12 (`packageManager` in `package.json`; Node 25+ no longer ships corepack, install it with `npm install -g pnpm@12`)
 - [Git](https://git-scm.com/downloads)
 - [Docker](https://www.docker.com/get-started) (optional, for containerized deployment)
 
@@ -194,7 +194,7 @@ before committing.
 
 #### Running the tests
 
-Use Node 22 (see `.nvmrc`) and pnpm 10 (`packageManager` in `package.json`).
+Use Node 24 (see `.nvmrc`) and pnpm 12 (`packageManager` in `package.json`).
 
 ```bash
 pnpm test:unit             # unit + component tests (with coverage)
@@ -297,7 +297,7 @@ _The diagram above shows how the different components of the application interac
 
 ### Tech Stack
 
-- **Framework**: [SvelteKit](https://kit.svelte.dev/) 2.0 with TypeScript - Serves as the foundation of the application, providing server-side rendering, routing, and integration with other tools. TypeScript adds type safety throughout the codebase.
+- **Framework**: [SvelteKit](https://svelte.dev/docs/kit) 3 with TypeScript - Serves as the foundation of the application, providing server-side rendering, routing, and integration with other tools. TypeScript adds type safety throughout the codebase.
 
 - **UI Components**: [shadcn-svelte](https://www.shadcn-svelte.com/) - Provides accessible, customizable UI components that are integrated throughout the application interface, ensuring a consistent design system while maintaining flexibility.
 
@@ -397,7 +397,7 @@ async function searchLocation(query: string) {
 ##### Vector Tiles
 
 **Approach**:
-The application uses custom styled vector tiles for the base map, with light and dark mode variants. The map styles are stored in `$lib/stores/mapStyle.ts` as `positronMapStyleDay` and `positronMapStyleNight`.
+The application uses custom styled vector tiles for the base map, with light and dark mode variants. The map styles are stored in `#lib/stores/mapStyle.ts` as `positronMapStyleDay` and `positronMapStyleNight`.
 
 **Used For**: Base map vector tiles rendered through MapLibre GL.
 
@@ -493,38 +493,40 @@ export const formattedTimeConfiguration = derived(
 ```typescript
 import { createQuery } from '@tanstack/svelte-query';
 
-const query = createQuery({
-	queryKey: ['data'],
-	queryFn: fetchData
-});
-```
+// the options are a function: reactive values read in it update the query
+const query = createQuery(() => ({
+	queryKey: ['stations-snapshot', dateKey, unitWithMinMaxAvg, scale],
+	queryFn: async () => {
+		/* fetch data */
+	},
+	enabled: Boolean(dateVal && unitWithMinMaxAvg)
+}));
 
-We also use reactive query arguments with our custom utilities:
-
-```typescript
-import { reactiveQueryArgs } from '$lib/utils/queryUtils.svelte';
-
-const query = createQuery(
-	reactiveQueryArgs(() => ({
-		queryKey: ['stations-snapshot', dateKey, unitWithMinMaxAvg, scale],
-		queryFn: async () => {
-			/* fetch data */
-		},
-		enabled: Boolean(dateVal && unitWithMinMaxAvg)
-	}))
-);
+// the result is reactive state (no store): query.data, query.isLoading, ...
 ```
 
 ### Data Visualization
 
-We use [LayerChart](https://layerchart.com/) for building complex, interactive charts through composition:
+We use [LayerChart](https://layerchart.com/) 2 for building complex, interactive charts through composition
+(see `TimeseriesLineChart.svelte`). It styles its axes and tooltips with the `--color-primary` and
+`--color-surface-*` theme colors in `src/app.css`:
 
-```typescript
-import { Chart, Line, Points } from '@layerchart/svelte';
+```svelte
+<script lang="ts">
+	import { Axis, Chart, Spline, Svg, Tooltip } from 'layerchart';
+</script>
 
-<Chart data={timeSeriesData}>
-  <Line x="time" y="temperature" />
-  <Points x="time" y="temperature" />
+<Chart data={timeSeriesData} x="date" y="temperature" tooltipContext={{ mode: 'bisect-x' }}>
+	{#snippet children()}
+		<Svg>
+			<Axis placement="left" grid rule />
+			<Axis placement="bottom" rule />
+			<Spline class="stroke-2" />
+		</Svg>
+		<Tooltip.Root portal={false}>
+			{#snippet children({ data })}{data.temperature} °C{/snippet}
+		</Tooltip.Root>
+	{/snippet}
 </Chart>
 ```
 
@@ -538,7 +540,7 @@ We use [typesafe-i18n](https://github.com/ivanhofer/typesafe-i18n) for type-safe
 Example translation usage:
 
 ```typescript
-import LL from '$i18n/i18n-svelte';
+import LL from '#i18n/i18n-svelte.js';
 
 // In your component
 $LL.pages.about.title(); // Type-safe translation
@@ -633,7 +635,7 @@ The application relies on several environment variables that need proper configu
 Dependencies should be updated regularly to ensure security and access to new features:
 
 1. **Regular Audit**: Run `pnpm audit` monthly to check for security vulnerabilities
-2. **Node Version Management**: Update the Node.js version in `.nvmrc` when necessary (currently uses 22.13.1)
+2. **Node Version Management**: Update the Node.js version in `.nvmrc` when necessary (currently 24.22.1; keep `engines` in `package.json`, both Dockerfiles and the CI workflows in sync)
 3. **Update Process**:
 
    ```bash
@@ -717,7 +719,7 @@ configured using these environment variables
 When modifying or adding new features, follow these patterns:
 
 - **URL State**: Use `sveltekit-search-params` for any state that should be shareable or bookmarkable
-- **UI State**: Use Svelte stores from `$lib/stores` for local UI state
+- **UI State**: Use Svelte stores from `#lib/stores` for local UI state
 - **API Data**: Use TanStack Query for server state in components
 
 ### Internationalization Maintenance

@@ -322,11 +322,6 @@ test.describe('address search', () => {
 
 		await expect(page).toHaveURL(/map_search_coordinates=7\.465515-51\.511336/);
 		await expect(searchInput(page)).toHaveValue(name);
-		// KNOWN ISSUE: the marker only renders for sure after the next map move (svelte-maplibre's
-		// MarkerLayer waits for a 'load' event that may have fired already), and the map does not
-		// fly to the result (see the test.fail below) – so nudge the map like a user would
-		await waitForMapIdle(page);
-		await page.evaluate(() => window.__D2R_MAP__!.panBy([1, 0], { animate: false }));
 		await expect(markers(page).first()).toBeVisible();
 		await expect(markers(page).first()).toHaveAccessibleName(/Friedensplatz/);
 		await markers(page).last().hover();
@@ -417,26 +412,17 @@ test.describe('address search', () => {
 		});
 	});
 
-	// KNOWN BUG: opening a url with a map search (reload, shared link, language switch after a
-	// search) puts svelte into an endless effect loop (effect_update_depth_exceeded) and freezes
-	// the page. Remove `test.fail` once fixed.
-	test.describe(() => {
-		// the frozen page cannot hand out its coverage
-		test.use({ collectCoverage: false });
-		test.fail('restores a search from the url', async ({ page }) => {
-			test.setTimeout(20_000);
-			// the frozen page never fires its load event
-			await page.goto(
-				appUrl('/en', {
-					...closedSidebar,
-					map_search: 'Somewhere',
-					map_search_coordinates: '7.466-51.511'
-				}),
-				{ waitUntil: 'commit' }
-			);
-			await expect(searchInput(page)).toHaveValue('Somewhere', { timeout: 5000 });
-			await expect(markers(page).first()).toHaveAccessibleName('Somewhere', { timeout: 5000 });
-			expect(await page.evaluate(() => Boolean(history.state?.locale))).toBe(true);
-		});
+	// a reload, shared link or language switch after a search
+	test('restores a search from the url', async ({ page }) => {
+		await open(
+			page,
+			appUrl('/en', {
+				...closedSidebar,
+				map_search: 'Somewhere',
+				map_search_coordinates: '7.466-51.511'
+			})
+		);
+		await expect(searchInput(page)).toHaveValue('Somewhere');
+		await expect(markers(page).first()).toHaveAccessibleName('Somewhere');
 	});
 });

@@ -784,7 +784,7 @@ const en = {
 			lorsTooltip: {
 				title: 'What are neighborhoods and action areas?',
 				description:
-					"Neighborhoods are smaller units within the city districts. Action areas highlight zones with special social development needs, defined within Dortmund´s <a class='focusable transition-opacity hover-hover:hover:opacity-50 underline decoration-primary underline-offset-4' href='https://www.dortmund.de/themen/soziales/aktionsplan-soziale-stadt/' target='_blank' rel='noopener noreferrer'>Social City Action Plan</a>."
+					"Neighborhoods are smaller units within the city districts. Action areas highlight zones with special social development needs, defined within Dortmund´s <a class='focusable transition-opacity hover:opacity-50 underline decoration-primary underline-offset-4' href='https://www.dortmund.de/themen/soziales/aktionsplan-soziale-stadt/' target='_blank' rel='noopener noreferrer'>Social City Action Plan</a>."
 			},
 			satellite: 'Digital Orthophotos',
 			satelliteTooltip: {

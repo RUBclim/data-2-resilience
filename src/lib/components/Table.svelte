@@ -1,8 +1,9 @@
-<script lang="ts" generics="T">
-	import { locale } from '$i18n/i18n-svelte';
+<script lang="ts" generics="T extends RowData">
+	import { locale } from '#i18n/i18n-svelte.js';
 	import Button from './ui/button/button.svelte';
 	import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-	import type { Table as TableType } from '@tanstack/table-core';
+	import { FlexRender, type RowData, type SvelteTable } from '@tanstack/svelte-table';
+	import type { StationsTableFeatures } from './StationsTable.svelte';
 
 	import {
 		ArrowDownAZ,
@@ -11,11 +12,11 @@
 		ChevronLast,
 		ChevronLeft,
 		ChevronRight
-	} from 'lucide-svelte';
-	import FlexRender from './table/flex-render.svelte';
+	} from '@lucide/svelte';
 
 	interface Props {
-		table: TableType<T>;
+		// the feature APIs (sorting, pagination) are typed by the registered features
+		table: SvelteTable<StationsTableFeatures, T>;
 	}
 
 	let { table }: Props = $props();
@@ -35,10 +36,7 @@
 								onclick={header.column.getToggleSortingHandler()}
 								class="flex items-center gap-2"
 							>
-								<FlexRender
-									context={header.getContext()}
-									content={header.column.columnDef.header}
-								/>
+								<FlexRender {header} />
 								{#if header.column.getIsSorted().toString() === 'asc'}
 									<ArrowDownAZ />
 								{:else if header.column.getIsSorted().toString() === 'desc'}
@@ -52,11 +50,11 @@
 		{/each}
 	</TableHeader>
 	<TableBody>
-		{#each table.getRowModel().rows.slice(0, table.getState().pagination.pageSize) as row}
+		{#each table.getRowModel().rows.slice(0, table.atoms.pagination.get().pageSize) as row}
 			<TableRow>
 				{#each row.getVisibleCells() as cell}
 					<TableCell>
-						<FlexRender context={cell.getContext()} content={cell.column.columnDef.cell} />
+						<FlexRender {cell} />
 					</TableCell>
 				{/each}
 			</TableRow>
@@ -67,7 +65,7 @@
 	<Button
 		variant="outline"
 		size="icon"
-		on:click={() => table.firstPage()}
+		onclick={() => table.firstPage()}
 		disabled={!table.getCanPreviousPage()}
 	>
 		<ChevronFirst class="size-5" />
@@ -75,7 +73,7 @@
 	<Button
 		variant="outline"
 		size="icon"
-		on:click={() => table.previousPage()}
+		onclick={() => table.previousPage()}
 		disabled={!table.getCanPreviousPage()}
 	>
 		<ChevronLeft class="size-5" />
@@ -83,7 +81,7 @@
 	<span class="flex items-center gap-1 px-4">
 		<div>Page</div>
 		<strong>
-			{table.getState().pagination.pageIndex + 1} of{' '}
+			{table.atoms.pagination.get().pageIndex + 1} of{' '}
 			{table.getPageCount().toLocaleString($locale, {
 				maximumFractionDigits: 0
 			})}
@@ -92,7 +90,7 @@
 	<Button
 		variant="outline"
 		size="icon"
-		on:click={() => table.nextPage()}
+		onclick={() => table.nextPage()}
 		disabled={!table.getCanNextPage()}
 	>
 		<ChevronRight class="size-5" />
@@ -100,7 +98,7 @@
 	<Button
 		variant="outline"
 		size="icon"
-		on:click={() => table.lastPage()}
+		onclick={() => table.lastPage()}
 		disabled={!table.getCanNextPage()}
 	>
 		<ChevronLast class="size-5" />

@@ -1,4 +1,4 @@
-import type { TranslationFunctions } from '$i18n/i18n-types';
+import type { TranslationFunctions } from '#i18n/i18n-types.js';
 import { getHealthRisksByUnit } from './healthRisksUtil';
 
 export function getHeatStressLabel(params: {

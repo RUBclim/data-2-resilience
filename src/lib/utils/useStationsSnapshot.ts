@@ -1,5 +1,5 @@
-import type { StationsGeoJSONType } from '$lib/stores/mapData';
-import { useStations } from '$lib/stores/stationsStore';
+import type { StationsGeoJSONType } from '#lib/stores/mapData.js';
+import { useStations } from '#lib/stores/stationsStore.js';
 import {
 	datavisType,
 	dayEndDate,
@@ -8,7 +8,7 @@ import {
 	rangeEndDate,
 	scale,
 	unitWithMinMaxAvg
-} from '$lib/stores/uiStore';
+} from '#lib/stores/uiStore.js';
 import { endOfDay, format, setHours } from 'date-fns';
 import { derived, type Readable } from 'svelte/store';
 import { api } from './api';
@@ -78,8 +78,7 @@ export function useStationsSnapshotConfig({
 					const itemResults = result?.data || [];
 					const items = (stations.features || []).map((s) => {
 						const station = itemResults.find((f) => f.id === s.properties.id) as
-							| SnapshotDataType
-							| undefined;
+							SnapshotDataType | undefined;
 						return {
 							id: s.properties.id || station?.id || '',
 							measured_at: station?.measured_at || today().toISOString(),

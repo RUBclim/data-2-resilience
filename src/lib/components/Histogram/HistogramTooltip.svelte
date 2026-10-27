@@ -10,17 +10,17 @@
 		root: 'w-56 bg-transparent chart-export-ignore opacity-0 group-hover:opacity-100',
 		container: cn(
 			'w-full border border-border shadow-lg p-3 group',
-			'bg-background dark:bg-background bg-opacity-80 backdrop-blur-sm'
+			'bg-background/80 backdrop-blur-xs'
 		),
 		content: 'w-full text-xs font-normal text-foreground shadow-none'
 	} satisfies ClassesType;
 </script>
 
 <script lang="ts">
-	import { LL, locale } from '$i18n/i18n-svelte';
-	import { unitOnly } from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
-	import { MousePointer } from 'lucide-svelte';
+	import { LL, locale } from '#i18n/i18n-svelte.js';
+	import { unitOnly } from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
+	import { MousePointer } from '@lucide/svelte';
 
 	type BaseItemType = {
 		id: string;
@@ -85,7 +85,7 @@
 
 {@html baseTooltipText}
 {#if totalItems > 0 && totalItems !== selectedItemsInBin.length}
-	<small class="grid grid-cols-[auto,1fr] items-center gap-x-1 py-1 text-xs text-muted-foreground">
+	<small class="grid grid-cols-[auto_1fr] items-center gap-x-1 py-1 text-xs text-muted-foreground">
 		<MousePointer class="size-3.5"></MousePointer>
 		<span>{$LL.pages.measurements.histogram.tooltip.clickToSelect(totalItems)}</span>
 	</small>
@@ -96,7 +96,7 @@
 	</strong>
 	<ul class="list-muted-foreground flex flex-wrap gap-x-1 gap-y-0.5 text-sm">
 		{#each selectedItemsInBin as sN, i}
-			<li class="inline-block max-w-48 overflow-clip text-ellipsis text-xs">
+			<li class="inline-block max-w-48 overflow-clip text-xs text-ellipsis">
 				{@html sN.label}{i < selectedItemsInBin.length - 1 ? ', ' : ''}
 			</li>
 		{/each}

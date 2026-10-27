@@ -1,5 +1,5 @@
-import type { TranslationFunctions } from '$i18n/i18n-types';
-import { cn } from '$lib/utils';
+import type { TranslationFunctions } from '#i18n/i18n-types.js';
+import { cn } from '#lib/utils.js';
 import { getColorScaleValue } from './colorScaleUtil';
 import { getHeatStressCategoryByValue } from './heatStressCategoriesUtil';
 export const healthRisksRanges = {

@@ -1,9 +1,16 @@
+<script module lang="ts">
+	import { setWorkerUrl } from 'maplibre-gl';
+	import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
+
+	// maplibre-gl 6 is ESM-only and no longer inlines its worker: vite emits it as an asset
+	setWorkerUrl(maplibreWorkerUrl);
+</script>
+
 <script lang="ts">
 	import { page } from '$app/state';
-	import { page as storePage } from '$app/stores';
-	import { locale } from '$i18n/i18n-svelte';
-	import type { StationsGeoJSONType } from '$lib/stores/mapData';
-	import { closePopup } from '$lib/stores/mapPopupsStore.svelte';
+	import { locale } from '#i18n/i18n-svelte.js';
+	import type { StationsGeoJSONType } from '#lib/stores/mapData.js';
+	import { closePopup } from '#lib/stores/mapPopupsStore.svelte.js';
 	import {
 		boundariesMode,
 		isLeftSidebarOpened,
@@ -19,12 +26,12 @@
 		updateMapSearch,
 		updateMapSearchCoordinates,
 		updateMapZoom
-	} from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
-	import type { AddressFeature } from '$lib/utils/searchUtil';
+	} from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
+	import type { AddressFeature } from '#lib/utils/searchUtil.js';
 	import { shortcut } from '@svelte-put/shortcut';
 	import { mode } from 'mode-watcher';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { MapLibre, ScaleControl, type Map } from 'svelte-maplibre';
 	import ChoroplethLegend from '../ChoroplethLegend.svelte';
 	import MapActionAreasLayer from './MapActionAreasLayer.svelte';
@@ -43,7 +50,7 @@
 		positronMapStyleNight,
 		positronMapStyleDayWithSatellite,
 		positronMapStyleNightWithSatellite
-	} from '$lib/stores/mapStyle';
+	} from '#lib/stores/mapStyle.js';
 
 	// Global patch to prevent AbortError from showing in console
 	const originalConsoleError = console.error;
@@ -80,10 +87,10 @@
 	// Base style selection (only for theme/satellite changes)
 	const baseMapStyle = $derived(
 		$showSatellite
-			? $mode === 'dark'
+			? mode.current === 'dark'
 				? positronMapStyleNightWithSatellite
 				: positronMapStyleDayWithSatellite
-			: $mode === 'dark'
+			: mode.current === 'dark'
 				? positronMapStyleNight
 				: positronMapStyleDay
 	);
@@ -97,6 +104,8 @@
 	// Effect 2: Handle visibility changes only (buildings/streets)
 	$effect(() => {
 		if (!map) return;
+		// the callbacks below run later: keep the narrowed map
+		const m = map;
 
 		$showBuildings;
 		$showStreets;
@@ -109,15 +118,15 @@
 					const buildingVisibility = $showBuildings ? 'visible' : 'none';
 					['building', 'building-top'].forEach((layerId) => {
 						try {
-							if (map.getLayer(layerId)) {
-								map.setLayoutProperty(layerId, 'visibility', buildingVisibility);
+							if (m.getLayer(layerId)) {
+								m.setLayoutProperty(layerId, 'visibility', buildingVisibility);
 							}
 						} catch (e) {}
 					});
 
 					// Streets
 					const streetVisibility = $showStreets ? 'visible' : 'none';
-					const style = map.getStyle();
+					const style = m.getStyle();
 					if (style?.layers) {
 						style.layers.forEach((layer) => {
 							try {
@@ -126,11 +135,11 @@
 									layer['source-layer'] === 'transportation' &&
 									!layer.id.includes('rail')
 								) {
-									map.setLayoutProperty(layer.id, 'visibility', streetVisibility);
+									m.setLayoutProperty(layer.id, 'visibility', streetVisibility);
 								}
 
 								if (layer.type === 'symbol' && layer['source-layer'] === 'transportation_name') {
-									map.setLayoutProperty(layer.id, 'visibility', streetVisibility);
+									m.setLayoutProperty(layer.id, 'visibility', streetVisibility);
 								}
 							} catch (e) {}
 						});
@@ -139,7 +148,7 @@
 					// CRITICAL FIX: After style change, ensure heat raster layers are positioned correctly
 					// This handles the race condition between style loading and raster layer re-addition
 					setTimeout(() => {
-						const style = map.getStyle();
+						const style = m.getStyle();
 						if (style?.layers) {
 							const heatRasterLayers = style.layers.filter(
 								(layer) =>
@@ -149,7 +158,7 @@
 							);
 							// Find the first road/transportation layer to position heat raster layers before streets
 							const firstRoadLayer = style.layers.find(
-								(layer) => layer['source-layer'] === 'transportation' && layer.type === 'line'
+								(layer) => layer.type === 'line' && layer['source-layer'] === 'transportation'
 							);
 							const buildingLayer = style.layers.find((layer) => layer.id === 'building');
 
@@ -158,7 +167,7 @@
 								heatRasterLayers.forEach((rasterLayer) => {
 									try {
 										// Move heat raster layers before first road layer (or building if no roads)
-										map.moveLayer(rasterLayer.id, targetLayerId);
+										m.moveLayer(rasterLayer.id, targetLayerId);
 									} catch (e) {}
 								});
 							}
@@ -171,15 +180,15 @@
 		};
 
 		// Apply immediately if map is loaded
-		if (map.loaded() && map.isStyleLoaded()) {
+		if (m.loaded() && m.isStyleLoaded()) {
 			applyVisibility();
 		}
 
 		// Also apply after style loads
-		map.on('style.load', applyVisibility);
+		m.on('style.load', applyVisibility);
 
 		return () => {
-			map.off('style.load', applyVisibility);
+			m.off('style.load', applyVisibility);
 		};
 	});
 
@@ -189,7 +198,7 @@
 		mapZ = $mapZoom;
 	});
 
-	const showSearchedFeature = (map: maplibregl.Map, feature: AddressFeature | undefined) => {
+	const showSearchedFeature = (map: Map, feature: AddressFeature | undefined) => {
 		if (!feature) return;
 		const [lng, lat] = feature.geometry.coordinates;
 		updateMapSearchCoordinates([lng, lat]);
@@ -200,7 +209,9 @@
 
 		if ($mapSearchCoordinates) {
 			const [lng, lat] = $mapSearchCoordinates;
-			map.flyTo({ center: [lng, lat], zoom: 10 });
+			const m = map;
+			// untracked: without a camera change `moveend` fires synchronously (see below)
+			untrack(() => m.flyTo({ center: [lng, lat], zoom: 10 }));
 		}
 	});
 
@@ -212,16 +223,19 @@
 
 	$effect(() => {
 		if (!map || !currentPage) return;
-		map.zoomTo(map.getZoom() || 10);
+		const m = map;
+		// an unchanged zoom fires `moveend` synchronously: its handlers read and write state, which
+		// must not become dependencies of this effect (effect_update_depth_exceeded)
+		untrack(() => m.zoomTo(m.getZoom() || 10));
 	});
 
-	function disableMapRotation(map: maplibregl.Map) {
+	function disableMapRotation(map: Map) {
 		map.dragRotate.disable();
 		map.keyboard.disable();
 		map.touchZoomRotate.disableRotation();
 	}
 
-	function onMapLoad(map: maplibregl.Map) {
+	function onMapLoad(map: Map) {
 		if (!map) return;
 		// test hook: lets e2e tests wait for the map to be idle (compiled away outside `--mode test`)
 		if (import.meta.env.MODE === 'test') window.__D2R_MAP__ = map;
@@ -234,7 +248,11 @@
 	}
 
 	boundariesMode.subscribe(() => closePopup());
-	storePage.subscribe(() => closePopup());
+	// close the popup on every navigation
+	$effect.pre(() => {
+		void page.url;
+		untrack(closePopup);
+	});
 </script>
 
 <svelte:window
@@ -295,9 +313,13 @@
 				<MapZoomControl {map} />
 				<MapLayerSelection />
 				<MapMeasurementsRasterLayer visible={currentPage === 'heat-stress'} {map} />
+
 				<MapDistrictsLayer visible={$boundariesMode === 'districts'} {displayMode} />
+
 				<MapLorsLayer visible={$boundariesMode === 'lors'} {displayMode} />
+
 				<MapActionAreasLayer visible={$boundariesMode === 'lors'} {displayMode} />
+
 				{#if currentPage === 'measurements'}
 					<MapStationsLayer {stations} {map} {initialStationIds} />
 				{/if}
@@ -312,6 +334,7 @@
 		</MapLibre>
 
 		<ChoroplethLegend {stations} {initialStationIds} />
+
 		<MapAttribution />
 	</div>
 </ErrorBoundary>

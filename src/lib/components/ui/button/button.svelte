@@ -1,37 +1,28 @@
 <script lang="ts">
-	import { Button as ButtonPrimitive } from 'bits-ui';
-	import { type Events, type Props, buttonVariants } from './index.js';
-	import { cn } from '$lib/utils.js';
-
-	type $$Props = Props;
-	type $$Events = Events;
-
-	interface Props_1 {
-		class?: $$Props['class'];
-		variant?: $$Props['variant'];
-		size?: $$Props['size'];
-		builders?: $$Props['builders'];
-		children?: import('svelte').Snippet;
-		[key: string]: any;
-	}
+	import { cn } from '#lib/utils.js';
+	import { type Props, buttonVariants } from './index.js';
 
 	let {
 		class: className = undefined,
 		variant = 'default',
 		size = 'default',
-		builders = [],
+		href = undefined,
+		type = 'button',
+		ref = $bindable(null),
 		children,
 		...rest
-	}: Props_1 = $props();
+	}: Props = $props();
 </script>
 
-<ButtonPrimitive.Root
-	{builders}
-	class={cn(buttonVariants({ variant, size, className }))}
-	type="button"
+<!-- the trigger props of bits-ui (`child` snippet) are spread onto this element through `rest` -->
+<svelte:element
+	this={href ? 'a' : 'button'}
+	bind:this={ref}
+	class={cn(buttonVariants({ variant, size }), className)}
+	type={href ? undefined : type}
+	{href}
+	tabindex={0}
 	{...rest}
-	on:click
-	on:keydown
 >
 	{@render children?.()}
-</ButtonPrimitive.Root>
+</svelte:element>

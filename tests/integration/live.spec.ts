@@ -30,12 +30,10 @@ test('the dashboard works against the live api, tile server, geocoder and basema
 		await responseOk(/\/v1\/network-snapshot\?/);
 		await responseOk(/tiles\.basemaps\.cartocdn\.com\/fonts\//);
 		await responseOk(/tiles\.basemaps\.cartocdn\.com\/gl\/positron-gl-style\/sprite/);
-		await expect(page.locator('#stations-datavis svg.layercake-layout-svg').first()).toContainText(
+		await expect(page.locator('#stations-datavis svg.lc-layout-svg').first()).toContainText(
 			'Hauptbahnhof'
 		);
-		await expect(
-			page.locator('#stations-histogram svg.layercake-layout-svg').first()
-		).toBeVisible();
+		await expect(page.locator('#stations-histogram svg.lc-layout-svg').first()).toBeVisible();
 	});
 
 	await test.step('measurements: time series of the selected stations', async () => {

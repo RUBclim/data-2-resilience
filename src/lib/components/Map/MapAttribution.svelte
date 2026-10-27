@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn } from '$lib/utils';
+	import { cn } from '#lib/utils.js';
 
 	const attributions = [
 		{
@@ -19,7 +19,7 @@
 
 <div
 	class={cn(
-		'fixed bottom-1 right-1 z-10 bg-background/80 text-muted-foreground backdrop-blur-[2px]',
+		'fixed right-1 bottom-1 z-10 bg-background/80 text-muted-foreground backdrop-blur-[2px]',
 		'rounded-sm border border-border px-1 py-0.5 text-xs'
 	)}
 >
@@ -30,9 +30,9 @@
 			target="_blank"
 			rel="noreferrer noopener"
 			class={cn(
-				'focusable underline decoration-muted-foreground/50 hover-hover:hover:decoration-primary',
+				'focusable underline decoration-muted-foreground/50 hover:decoration-primary',
 				'underline-offset-2 focus-visible:rounded-sm',
-				'text-muted-foreground transition-colors hover-hover:hover:text-foreground'
+				'text-muted-foreground transition-colors hover:text-foreground'
 			)}
 		>
 			{attribution.name}
