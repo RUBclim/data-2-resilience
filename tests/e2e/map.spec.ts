@@ -166,15 +166,40 @@ test.describe('map layers', () => {
 
 	test('buildings and streets can be hidden and shown', async ({ page }) => {
 		await open(page, appUrl('/en', closedSidebar));
+		// each toggle re-lays out the tiles; wait for that (KNOWN BUG, see the test.fail below)
 		await toggleLayer(page, 'Buildings');
 		await expect.poll(() => layerVisibility(page, 'building')).toBe('none');
+		await waitForMapIdle(page);
 		await toggleLayer(page, 'Streets');
 		await expect.poll(() => layerVisibility(page, 'road_pri_case_noramp')).toBe('none');
+		await waitForMapIdle(page);
 
 		await toggleLayer(page, 'Buildings');
 		await expect.poll(() => layerVisibility(page, 'building')).toBe('visible');
+		await waitForMapIdle(page);
 		await toggleLayer(page, 'Streets');
 		await expect.poll(() => layerVisibility(page, 'road_pri_case_noramp')).toBe('visible');
+	});
+
+	// KNOWN BUG: Map.svelte only applies the buildings/streets visibility while `map.loaded()`, which
+	// is false as long as tiles load (e.g. right after another layer was toggled): the toggle is
+	// lost. Remove `test.fail` once fixed.
+	test.fail('buildings can be hidden while the map loads tiles', async ({ page }) => {
+		await open(page, appUrl('/en', closedSidebar));
+		let releaseTiles = () => {};
+		const tilesReleased = new Promise<void>((resolve) => (releaseTiles = resolve));
+		await page.route('**/openmaptiles/**', async (route) => {
+			await tilesReleased;
+			await route.fallback();
+		});
+		try {
+			await page.getByRole('button', { name: 'Zoom in' }).click();
+			await expect.poll(() => page.evaluate(() => window.__D2R_MAP__!.loaded())).toBe(false);
+			await toggleLayer(page, 'Buildings');
+			await expect.poll(() => layerVisibility(page, 'building'), { timeout: 3000 }).toBe('none');
+		} finally {
+			releaseTiles();
+		}
 	});
 
 	test('the layer tooltips explain each layer', async ({ page }) => {

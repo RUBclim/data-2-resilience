@@ -4,7 +4,16 @@ import { SERVER_V8_COVERAGE_DIR } from './tests/support/coverage-options.mjs';
 
 const desktop = { viewport: { width: 1440, height: 900 } };
 
+// Rendering the map with a software WebGL renderer takes most of the CPU time of the suite.
+// Outside the pinned docker image screenshots are not compared, so `PW_GPU=1` lets local runs
+// render on the GPU of the machine instead (chromium only, needs a Vulkan driver).
+const gpu = !!process.env.PW_GPU && !process.env.PW_DOCKER && !process.env.CI;
+const chromiumWebGL = gpu
+	? { launchOptions: { args: ['--use-angle=vulkan', '--enable-features=Vulkan'] } }
+	: {};
+
 // headless firefox has WebGL disabled by default; force the mesa llvmpipe software renderer
+// (headless firefox does not get any faster on the GPU)
 const firefoxWebGL = {
 	launchOptions: {
 		firefoxUserPrefs: { 'webgl.force-enabled': true },
@@ -51,12 +60,15 @@ export default defineConfig({
 	},
 
 	projects: [
-		{ name: 'chromium-desktop', use: { ...devices['Desktop Chrome'], ...desktop } },
+		{
+			name: 'chromium-desktop',
+			use: { ...devices['Desktop Chrome'], ...desktop, ...chromiumWebGL }
+		},
 		{
 			name: 'firefox-desktop',
 			use: { ...devices['Desktop Firefox'], ...desktop, ...firefoxWebGL }
 		},
-		{ name: 'chromium-mobile', use: { ...devices['Pixel 7'] } },
+		{ name: 'chromium-mobile', use: { ...devices['Pixel 7'], ...chromiumWebGL } },
 		{
 			name: 'firefox-mobile',
 			// firefox does not support `isMobile`

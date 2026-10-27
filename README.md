@@ -211,6 +211,11 @@ compared inside the image defined in `tests/docker/Dockerfile`. CI uses the same
 
 - Update baselines intentionally with `pnpm test:e2e:docker --update-snapshots`.
 - Prove that the replay needs no network with `DOCKER_NETWORK=none scripts/docker.sh pnpm test:e2e`.
+- Outside docker, `PW_GPU=1 pnpm test:e2e` renders the map in Chromium on the GPU (needs a Vulkan
+  driver). The software WebGL renderer takes most of the CPU time of the suite, so this is
+  considerably faster.
+- The e2e tests run without CSS transitions, so that nothing moves after the change that started
+  it (see `tests/e2e/support/fixtures.ts`).
 
 #### Coverage
 

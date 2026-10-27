@@ -127,6 +127,15 @@ export const test = base.extend<TestOptions & TestFixtures>({
 		// throttling (e.g. svelte-maplibre markers). Requests only use hour/day precision.
 		await page.clock.install({ time: new Date(FIXED_NOW) });
 		await page.clock.resume();
+		await page.addInitScript(trackUrlWriterTimers);
+		// CSS transitions (e.g. the 300ms of the sidebar and its grid column) move and resize
+		// elements after the change that started them: coordinates, map canvas sizes and positions
+		// of tour steps would depend on when they were measured
+		await page.addInitScript(() => {
+			const style = document.createElement('style');
+			style.textContent = '*, *::before, *::after { transition: none !important; }';
+			addEventListener('DOMContentLoaded', () => document.head.append(style), { once: true });
+		});
 		if (skipWelcomeTour) {
 			await page.addInitScript(() => {
 				if (localStorage.getItem('welcome-opened') === null) {
@@ -140,8 +149,9 @@ export const test = base.extend<TestOptions & TestFixtures>({
 		page.on('requestfailed', (r) => inFlight.delete(r));
 		await use(page);
 		// let late requests (map tiles/glyphs, debounced searches) happen before the recording is
-		// closed, so that recording and replay always see the same set of requests
-		if (!page.isClosed() && testInfo.status === 'passed') {
+		// closed, so that the recording has every request a replay may issue. A replay may stop
+		// early: whatever it has not requested yet is never needed.
+		if (RECORD && !page.isClosed() && testInfo.status === 'passed') {
 			if (await page.locator('#map').count()) {
 				await waitForMapIdle(page).catch(() => {});
 			}
@@ -187,19 +197,71 @@ export async function open(page: Page, url: string, { waitForMap = true } = {}) 
 }
 
 /**
- * sveltekit-search-params writes the UI state into the URL with debounced (500ms) navigations,
- * which would cancel a navigation started by the test in the meantime.
+ * The UI state is written into the URL by debounced writers: the setters in uiStore.ts debounce
+ * by 500ms, then sveltekit-search-params navigates another 500ms later (`debounceHistory`) with
+ * the query string it copied in between. Such a navigation would revert or cancel what the test
+ * did in the meantime – so wait until no writer is pending (see trackUrlWriterTimers) and the
+ * URL has been quiet for a moment.
  */
-export async function waitForUrlToSettle(page: Page, quietMs = 800) {
+export async function waitForUrlToSettle(page: Page, quietMs = 200) {
+	const isWriting = () =>
+		page
+			.evaluate(() => (window.__D2R_URL_TIMERS__?.size ?? 0) > 0)
+			// (a full page load in between)
+			.catch(() => true);
 	let last = page.url();
 	let stableSince = Date.now();
 	while (Date.now() - stableSince < quietMs) {
-		await page.waitForTimeout(100);
-		if (page.url() !== last) {
+		await page.waitForTimeout(50);
+		if (page.url() !== last || (await isWriting())) {
 			last = page.url();
 			stableSince = Date.now();
 		}
 	}
+}
+
+declare global {
+	interface Window {
+		/** timers of the debounced URL writers that have not finished yet (tests only) */
+		__D2R_URL_TIMERS__?: Set<number>;
+	}
+}
+
+/**
+ * Init script: tracks the pending timers in the range of the URL writers' debounces (300–500ms,
+ * see waitForUrlToSettle) in `window.__D2R_URL_TIMERS__`. A timer counts until its callback has
+ * finished, for sveltekit-search-params' async `navigate` until its `goto` has resolved. Shorter
+ * (frames, batching) and longer timers (query retries, "copied" resets) are not tracked.
+ */
+function trackUrlWriterTimers() {
+	const pending = (window.__D2R_URL_TIMERS__ = new Set<number>());
+	const { setTimeout: set, clearTimeout: clear } = window;
+	window.setTimeout = ((handler: TimerHandler, timeout = 0, ...args: unknown[]) => {
+		if (typeof handler !== 'function' || timeout < 250 || timeout > 600) {
+			return set(handler, timeout, ...args);
+		}
+		const id = set(
+			(...callbackArgs: unknown[]) => {
+				const done = () => pending.delete(id);
+				try {
+					const result = handler(...callbackArgs);
+					if (result instanceof Promise) result.then(done, done);
+					else done();
+				} catch (e) {
+					done();
+					throw e;
+				}
+			},
+			timeout,
+			...args
+		);
+		pending.add(id);
+		return id;
+	}) as typeof window.setTimeout;
+	window.clearTimeout = (id) => {
+		if (typeof id === 'number') pending.delete(id);
+		clear(id);
+	};
 }
 
 /**
