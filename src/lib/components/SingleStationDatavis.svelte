@@ -1,23 +1,28 @@
 <script lang="ts">
-	import { LL } from '$i18n/i18n-svelte';
-	import { unit, unitOnly } from '$lib/stores/uiStore';
-	import { getColorScaleValue } from '$lib/utils/colorScaleUtil';
-	import { getHealthRiskKeyByValue } from '$lib/utils/healthRisksUtil';
+	import { LL } from '#i18n/i18n-svelte.js';
+	import { unit, unitOnly } from '#lib/stores/uiStore.js';
+	import { getColorScaleValue } from '#lib/utils/colorScaleUtil.js';
+	import { getHealthRiskKeyByValue } from '#lib/utils/healthRisksUtil.js';
 
 	type Props = {
 		isLoading: boolean;
 		label: string | undefined;
 		value: string | number | undefined;
+		/** the range of the color scale, as for the other stations */
+		min: number | null;
+		max: number | null;
 	};
 
-	const { isLoading, label, value }: Props = $props();
+	const { isLoading, label, value, min, max }: Props = $props();
 
 	const color = $derived(
 		value &&
 			getColorScaleValue({
 				unit: $unit,
 				LL: $LL,
-				value
+				value,
+				min,
+				max
 			})
 	);
 
@@ -35,7 +40,7 @@
 	);
 </script>
 
-<div class="relative flex flex-col items-center justify-center gap-2 pb-6 pt-2">
+<div class="relative flex flex-col items-center justify-center gap-2 pt-2 pb-6">
 	<strong class="flex items-center justify-center gap-2 text-3xl leading-tight">
 		{#if isLoading}
 			<span class="inline-block h-6 w-24 animate-pulse rounded-sm bg-muted-foreground/20"></span>

@@ -1,22 +1,22 @@
 <script lang="ts">
-	import { LL, locale } from '$i18n/i18n-svelte';
-	import { stations } from '$lib/stores/mapData';
-	import { unit, unitOnly } from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
-	import { CHART_COLORS } from '$lib/utils/chartUtils';
-	import { getColorScaleValue } from '$lib/utils/colorScaleUtil';
+	import { LL, locale } from '#i18n/i18n-svelte.js';
+	import { stations } from '#lib/stores/mapData.js';
+	import { unit, unitOnly } from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
+	import { CHART_COLORS } from '#lib/utils/chartUtils.js';
+	import { getColorScaleValue } from '#lib/utils/colorScaleUtil.js';
 	import {
 		getHealthRiskByKey,
 		getHealthRiskKeyByValue,
 		getHealthRiskPill,
 		isHealthRiskUnit
-	} from '$lib/utils/healthRisksUtil';
+	} from '#lib/utils/healthRisksUtil.js';
 	import {
 		getHeatStressCategoryByValue,
 		getHeatStressValueByCategory,
 		valueToCategoryMap
-	} from '$lib/utils/heatStressCategoriesUtil';
-	import { getHeatStressLabel } from '$lib/utils/textUtil';
+	} from '#lib/utils/heatStressCategoriesUtil.js';
+	import { getHeatStressLabel } from '#lib/utils/textUtil.js';
 	import { scaleLinear, type ScaleLinear, scaleOrdinal, scaleTime } from 'd3-scale';
 	import {
 		Axis,
@@ -29,7 +29,7 @@
 		Svg,
 		Tooltip
 	} from 'layerchart';
-	import { LoaderCircle } from 'lucide-svelte';
+	import { LoaderCircle } from '@lucide/svelte';
 	import ErrorAlert from './ErrorAlert.svelte';
 	import { tooltipClasses } from './Histogram/HistogramTooltip.svelte';
 
@@ -168,114 +168,124 @@
 			{yScale}
 			yNice={!isOrdinal}
 			{padding}
-			tooltip={{ mode: 'bisect-x' }}
-			let:yScale={chartYScale}
-			let:width
-			let:height
+			tooltipContext={{ mode: 'bisect-x' }}
 		>
-			{@const scaleY = chartYScale as ScaleLinear<number, number>}
-			{@const scaleYDomain = scaleY.domain()}
-			<Svg>
-				<Axis
-					placement="left"
-					rule
-					grid
-					classes={{ tickLabel: 'text-xs' }}
-					tickLabelProps={{ dx: -8 }}
-					format={yTickFormat}
-					ticks={isOrdinal ? valueToCategoryMap.size : undefined}
-				/>
-				<Axis
-					placement="bottom"
-					format={xTickFormat}
-					rule
-					classes={{ tickLabel: 'text-xs' }}
-					tickLabelProps={{ dy: 8 }}
-					ticks={4}
-				/>
-				{#if isOrdinal}
-					{#each valueToCategoryMap.entries() as [val, key]}
-						{@const seriesHeight = Math.ceil(height / valueToCategoryMap.size) + 3}
-						{@const color = getColorScaleValue({ unit: $unit, LL: $LL, value: key, min, max })}
-						<Rect
-							x={width + catAsideWidth}
-							y={scaleY(val) - seriesHeight / 2}
-							width={catAsideWidth}
-							height={Math.abs(seriesHeight)}
-							class="no-stroke"
-							fill={color}
+			{#snippet children({ context })}
+				{@const scaleY = context.yScale as ScaleLinear<number, number>}
+				{@const scaleYDomain = scaleY.domain()}
+				{@const { width, height } = context}
+				<Svg>
+					<Axis
+						placement="left"
+						rule
+						grid
+						classes={{ tickLabel: 'text-xs' }}
+						tickLabelProps={{ dx: -8 }}
+						format={yTickFormat}
+						ticks={isOrdinal ? valueToCategoryMap.size : undefined}
+					/>
+					<Axis
+						placement="bottom"
+						format={xTickFormat}
+						rule
+						classes={{ tickLabel: 'text-xs' }}
+						tickLabelProps={{ dy: 8 }}
+						ticks={4}
+					/>
+					{#if isOrdinal}
+						{#each valueToCategoryMap.entries() as [val, key]}
+							{@const seriesHeight = Math.ceil(height / valueToCategoryMap.size) + 3}
+							{@const color = getColorScaleValue({ unit: $unit, LL: $LL, value: key, min, max })}
+							<Rect
+								x={width + catAsideWidth}
+								y={scaleY(val) - seriesHeight / 2}
+								width={catAsideWidth}
+								height={Math.abs(seriesHeight)}
+								class="no-stroke"
+								fill={color}
+							/>
+						{/each}
+					{:else if isHealthUnit}
+						{@const minVal = yDomain[0] || scaleYDomain[0]}
+						{@const maxVal = yDomain[1] || scaleYDomain[1]}
+						{@const ticksCount = 10}
+						{@const colorTicks = [
+							...Array.from({ length: ticksCount }, (_, i) => {
+								const tickStep = Math.round(Math.abs(maxVal - minVal) / ticksCount);
+								if (i === 0) return minVal;
+								if (i === ticksCount - 1) return maxVal;
+								return minVal + i * tickStep;
+							})
+						]}
+						<LinearGradient
+							stops={colorTicks.toReversed().map((d) =>
+								getColorScaleValue({
+									unit: $unit,
+									LL: $LL,
+									value: d,
+									min,
+									max
+								})
+							)}
+							vertical
+							units="objectBoundingBox"
+						>
+							{#snippet children({ gradient })}
+								<Rect
+									x={width + catAsideWidth}
+									y={scaleY(yDomain[1] || scaleYDomain[1])}
+									width={catAsideWidth}
+									height={scaleY(yDomain[0] || scaleYDomain[0]) -
+										scaleY(yDomain[1] || scaleYDomain[1])}
+									class="no-stroke"
+									fill={gradient}
+								/>
+							{/snippet}
+						</LinearGradient>
+					{/if}
+					{#each stationNames as name, idx}
+						<Spline
+							{data}
+							class="stroke-2"
+							stroke={CHART_COLORS[idx]}
+							y={(d) => d[name]}
+							x="date"
 						/>
 					{/each}
-				{:else if isHealthUnit}
-					{@const minVal = yDomain[0] || scaleYDomain[0]}
-					{@const maxVal = yDomain[1] || scaleYDomain[1]}
-					{@const ticksCount = 10}
-					{@const colorTicks = [
-						...Array.from({ length: ticksCount }, (_, i) => {
-							const tickStep = Math.round(Math.abs(maxVal - minVal) / ticksCount);
-							if (i === 0) return minVal;
-							if (i === ticksCount - 1) return maxVal;
-							return minVal + i * tickStep;
-						})
-					]}
-					<LinearGradient
-						stops={colorTicks.toReversed().map((d) =>
-							getColorScaleValue({
-								unit: $unit,
-								LL: $LL,
-								value: d,
-								min,
-								max
-							})
-						)}
-						vertical
-						units="objectBoundingBox"
-						let:gradient
-					>
-						<Rect
-							x={width + catAsideWidth}
-							y={scaleY(yDomain[1] || scaleYDomain[1])}
-							width={catAsideWidth}
-							height={scaleY(yDomain[0] || scaleYDomain[0]) - scaleY(yDomain[1] || scaleYDomain[1])}
-							class="no-stroke"
-							fill={gradient}
-						/>
-					</LinearGradient>
-				{/if}
-				{#each stationNames as name, idx}
-					<Spline {data} class="stroke-2" stroke={CHART_COLORS[idx]} y={(d) => d[name]} x="date" />
-				{/each}
-				{#each stationNames as name, idx}
-					<Highlight y={(d) => d[name]} points={{ fill: CHART_COLORS[idx] }} />
-				{/each}
-				<Highlight lines points />
-			</Svg>
+					{#each stationNames as name, idx}
+						<Highlight y={(d) => d[name]} points={{ fill: CHART_COLORS[idx] }} />
+					{/each}
+					<Highlight lines points />
+				</Svg>
 
-			<Legend
-				scale={cScale}
-				variant="swatches"
-				tickFormat={(d) =>
-					$stations.features.find((f) => f.properties.id === d)?.properties.longName || d}
-				classes={{
-					root: 'absolute inset-x-0 bottom-0',
-					swatches: 'items-center justify-center w-full flex flex-wrap gap-x-4',
-					swatch: 'w-3 h-0.5',
-					item: () => 'flex items-center gap-x-2',
-					label: 'chart-legend-label' // Needed to correct a shift in the chart export
-				}}
-			/>
-			<Tooltip.Root
-				let:data
-				classes={{
-					...tooltipClasses,
-					root: cn(tooltipClasses.root, isHealthUnit && !isOrdinal ? 'w-80' : 'w-64', 'mt-24')
-				}}
-				xOffset={isHealthUnit && !isOrdinal ? -80 : 10}
-				anchor={'right'}
-				contained="window"
-			>
-				{@html tooltipTemplate(data)}
-			</Tooltip.Root>
+				<Legend
+					scale={cScale}
+					variant="swatches"
+					tickFormat={(d) =>
+						$stations.features.find((f) => f.properties.id === d)?.properties.longName || d}
+					classes={{
+						root: 'absolute inset-x-0 bottom-0',
+						items: 'items-center justify-center w-full flex flex-wrap gap-x-4',
+						swatch: 'w-3 h-0.5',
+						item: () => 'flex items-center gap-x-2',
+						label: 'chart-legend-label' // Needed to correct a shift in the chart export
+					}}
+				/>
+				<Tooltip.Root
+					classes={{
+						...tooltipClasses,
+						root: cn(tooltipClasses.root, isHealthUnit && !isOrdinal ? 'w-80' : 'w-64', 'mt-24')
+					}}
+					xOffset={isHealthUnit && !isOrdinal ? -80 : 10}
+					anchor={'right'}
+					contained="window"
+					portal={false}
+				>
+					{#snippet children({ data })}
+						{@html tooltipTemplate(data)}
+					{/snippet}
+				</Tooltip.Root>
+			{/snippet}
 		</Chart>
 	{:else if !error && !isLoading && data && data.length === 0}
 		<div class="absolute inset-0 flex items-center justify-center">

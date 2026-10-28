@@ -1,9 +1,9 @@
-import type { StationsGeoJSONType } from '$lib/stores/mapData';
-import { api } from '$lib/utils/api';
-import { limitDateBoundsToToday } from '$lib/utils/dateUtil';
-import { normalizeHealthRiskKey } from '$lib/utils/healthRisksUtil';
-import { getHeatStressValueByCategory } from '$lib/utils/heatStressCategoriesUtil';
-import type { WeatherMeasurementKeyNoMinMax } from '$lib/utils/schemas';
+import type { StationsGeoJSONType } from '#lib/stores/mapData.js';
+import { api } from '#lib/utils/api.js';
+import { limitDateBoundsToToday } from '#lib/utils/dateUtil.js';
+import { normalizeHealthRiskKey } from '#lib/utils/healthRisksUtil.js';
+import { getHeatStressValueByCategory } from '#lib/utils/heatStressCategoriesUtil.js';
+import type { WeatherMeasurementKeyNoMinMax } from '#lib/utils/schemas.js';
 import { compareAsc, format, isValid, parseISO } from 'date-fns';
 
 type ParsedValueType = {
@@ -86,8 +86,7 @@ export const getStationDataFetcher =
 	};
 
 type PromiseResult<T> =
-	| { id: string; supported: false }
-	| { supported: true; data: T; id: undefined };
+	{ id: string; supported: false } | { supported: true; data: T; id: undefined };
 function notEmptyAndNotUnsupported<T>(
 	item: PromiseResult<T>
 ): item is { supported: true; data: T; id: undefined } {

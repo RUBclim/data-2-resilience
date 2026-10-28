@@ -1,6 +1,6 @@
-import { browser } from '$app/environment';
-import type { Locales } from '$i18n/i18n-types';
-import { loadLocaleAsync } from '$i18n/i18n-util.async';
+import { browser } from '$app/env';
+import type { Locales } from '#i18n/i18n-types.js';
+import { loadLocaleAsync } from '#i18n/i18n-util.async.js';
 import { QueryClient } from '@tanstack/svelte-query';
 
 import type { LayoutLoad } from './$types';

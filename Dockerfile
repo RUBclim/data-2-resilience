@@ -1,9 +1,8 @@
-FROM node:22-slim AS base
+FROM node:24-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN : \
-    && corepack enable \
-    && corepack prepare pnpm@10.34.7 --activate
+# node 25+ no longer ships corepack: install the version of `packageManager` in package.json
+RUN npm install -g pnpm@12.15.0
 COPY . /app
 WORKDIR /app
 
@@ -17,7 +16,7 @@ ENV VERCEL_PROJECT_PRODUCTION_URL=dashboard.data2resilience.de
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
 
-FROM node:22-slim
+FROM node:24-slim
 RUN : \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \

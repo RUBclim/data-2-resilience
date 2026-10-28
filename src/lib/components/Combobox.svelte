@@ -1,12 +1,12 @@
 <script lang="ts" generics="T">
-	import Check from 'lucide-svelte/icons/check';
-	import ChevronsUpDown from 'lucide-svelte/icons/chevrons-up-down';
+	import Check from '@lucide/svelte/icons/check';
+	import ChevronsUpDown from '@lucide/svelte/icons/chevrons-up-down';
 	import { tick } from 'svelte';
-	import * as Command from '$lib/components/ui/command/index.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { cn } from '$lib/utils.js';
-	import { LL } from '$i18n/i18n-svelte';
+	import * as Command from '#lib/components/ui/command/index.js';
+	import * as Popover from '#lib/components/ui/popover/index.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { cn } from '#lib/utils.js';
+	import { LL } from '#i18n/i18n-svelte.js';
 
 	const {
 		selectOptionText = $LL.generic.combobox.selectOption(),
@@ -26,7 +26,9 @@
 		};
 	} = $props();
 
+	const triggerId = $props.id();
 	let open = $state(false);
+	// svelte-ignore state_referenced_locally
 	let value = $state(defaultValue);
 
 	const selectedValue = $derived(options.find((f) => f.value === value)?.label ?? selectOptionText);
@@ -42,18 +44,20 @@
 	}
 </script>
 
-<Popover.Root bind:open let:ids>
-	<Popover.Trigger asChild let:builder>
-		<Button
-			builders={[builder]}
-			variant="outline"
-			role="combobox"
-			aria-expanded={open}
-			class={cn('w-[200px] justify-between', classes.trigger)}
-		>
-			{selectedValue}
-			<ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-		</Button>
+<Popover.Root bind:open>
+	<Popover.Trigger id={triggerId}>
+		{#snippet child({ props })}
+			<Button
+				{...props}
+				variant="outline"
+				role="combobox"
+				aria-expanded={open}
+				class={cn('w-[200px] justify-between', classes.trigger)}
+			>
+				{selectedValue}
+				<ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+			</Button>
+		{/snippet}
 	</Popover.Trigger>
 	<Popover.Content class="w-[200px] p-0">
 		<Command.Root>
@@ -64,11 +68,11 @@
 			<Command.Group>
 				{#each options as option}
 					<Command.Item
-						value={option.value}
-						onSelect={(currentValue: T) => {
-							value = currentValue;
+						value={`${option.value}`}
+						onSelect={() => {
+							value = option.value;
 							onChange(value);
-							closeAndFocusTrigger(ids.trigger);
+							closeAndFocusTrigger(triggerId);
 						}}
 					>
 						<Check class={cn('mr-2 h-4 w-4', value !== option.value && 'text-transparent')} />

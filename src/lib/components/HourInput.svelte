@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { LL } from '$i18n/i18n-svelte';
-	import { dayEndDate, hour, updateHour } from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
-	import { isToday, today } from '$lib/utils/dateUtil';
-	import Button from 'components/ui/button/button.svelte';
+	import { LL } from '#i18n/i18n-svelte.js';
+	import { dayEndDate, hour, updateHour } from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
+	import { isToday, today } from '#lib/utils/dateUtil.js';
+	import Button from '#lib/components/ui/button/button.svelte';
 	import { getHours } from 'date-fns';
-	import { ArrowDown, ArrowUp } from 'lucide-svelte';
+	import { ArrowDown, ArrowUp } from '@lucide/svelte';
 	import {
 		PopoverTooltip,
 		PopoverTooltipContent,
@@ -91,7 +91,7 @@
 		class={cn(
 			'pointer-events-auto rounded border border-border',
 			'bg-background px-3 py-2 text-center text-xl text-foreground',
-			'row-span-2 border-none outline-none',
+			'row-span-2 border-none outline-hidden',
 			'focus-visible:ring-2 focus-visible:ring-ring',
 			'focus-visible:ring-offset-2 focus-visible:ring-offset-background',
 			'relative focus-visible:z-10 focus-visible:rounded',
@@ -110,7 +110,7 @@
 					classes.button,
 					classes.buttonUp
 				)}
-				on:click={onHourUp}
+				onclick={onHourUp}
 				aria-label={$LL.generic.hourInput.buttonUpAriaLabel()}
 				disabled={upIsDisabled}
 			>
@@ -133,7 +133,7 @@
 			classes.button,
 			classes.buttonDown
 		)}
-		on:click={onHourDown}
+		onclick={onHourDown}
 		aria-label={$LL.generic.hourInput.buttonDownAriaLabel()}
 	>
 		<ArrowDown class={cn('size-4', classes.icon, classes.iconDown)} />

@@ -1,4 +1,4 @@
-import { PUBLIC_VITE_BASE_URL } from '$env/static/public';
+import { PUBLIC_VITE_BASE_URL } from '$app/env/public';
 import type { StyleSpecification } from 'maplibre-gl';
 
 // Default satellite-disbled versions

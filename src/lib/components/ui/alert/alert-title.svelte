@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
 	import type { HeadingLevel } from './index.js';
-	import { cn } from '$lib/utils.js';
+	import { cn } from '#lib/utils.js';
 
 	type $$Props = HTMLAttributes<HTMLHeadingElement> & {
 		level?: HeadingLevel;
@@ -19,7 +19,7 @@
 
 <svelte:element
 	this={level}
-	class={cn('mb-1 font-medium leading-none tracking-tight', className)}
+	class={cn('mb-1 leading-none font-medium tracking-tight', className)}
 	{...rest}
 >
 	{@render children?.()}

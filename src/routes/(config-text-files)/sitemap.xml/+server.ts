@@ -1,5 +1,5 @@
-import { baseLocale, locales } from '$i18n/i18n-util';
-import { PUBLIC_VITE_BASE_URL } from '$env/static/public';
+import { baseLocale, locales } from '#i18n/i18n-util.js';
+import { PUBLIC_VITE_BASE_URL } from '$app/env/public';
 
 const site = PUBLIC_VITE_BASE_URL; // change this to reflect your domain
 // populate this with all the slugs you wish to include

@@ -1,6 +1,6 @@
 import * as topojson from 'topojson-client';
 
-import { api } from '$lib/utils/api';
+import { api } from '#lib/utils/api.js';
 import { writable } from 'svelte/store';
 import type { StationMetadata } from '../utils/schemas';
 

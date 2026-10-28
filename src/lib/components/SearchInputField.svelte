@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { cn } from '$lib/utils';
-	import { Search, ArrowLeftToLine } from 'lucide-svelte';
+	import { cn } from '#lib/utils.js';
+	import { Search, ArrowLeftToLine } from '@lucide/svelte';
 	import { Button } from './ui/button';
 	import { shortcut } from '@svelte-put/shortcut';
 
@@ -77,7 +77,7 @@
 			}}
 			{placeholder}
 			class={cn(
-				'py-2 pl-3 pr-12 text-base placeholder-muted-foreground',
+				'py-2 pr-12 pl-3 text-base placeholder:text-muted-foreground',
 				'w-64 max-w-full rounded border border-border bg-background',
 				'focusable focus-visible:border-muted-foreground',
 				classNames?.input
@@ -86,7 +86,7 @@
 		<Button
 			size="icon"
 			variant="ghost"
-			on:click={() => {
+			onclick={() => {
 				if (value.length === 0) {
 					inputElement?.focus();
 				} else {
@@ -94,7 +94,7 @@
 				}
 			}}
 			class={cn(
-				'absolute right-px top-1/2 h-[calc(100%-2px)] -translate-y-1/2',
+				'absolute top-1/2 right-px h-[calc(100%-2px)] -translate-y-1/2',
 				'rounded-none rounded-r-sm focus-visible:rounded',
 				'border-l border-muted',
 				classNames?.button
@@ -109,7 +109,7 @@
 		<span
 			aria-hidden="true"
 			class={cn(
-				'absolute right-12 top-1/2 -translate-y-1/2 px-1',
+				'absolute top-1/2 right-12 -translate-y-1/2 px-1',
 				'inline-flex items-center gap-0.5 text-muted-foreground',
 				'transition-opacity',
 				hasFocus || value.length > 0 ? 'opacity-0' : 'opacity-100'

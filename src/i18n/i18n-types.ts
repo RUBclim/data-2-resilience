@@ -4217,7 +4217,7 @@ export type TranslationFunctions = {
 				 */
 				title: () => LocalizedString
 				/**
-				 * Stadtteile sind kleinere, lebensnahe Einheiten innerhalb der Stadtbezirke. Aktionsräume markieren Bereiche mit besonderem sozialen Förderbedarf. Diese stammen aus dem <a class='focusable transition-opacity hover-hover:hover:opacity-50 underline decoration-primary underline-offset-4' href='https://www.dortmund.de/themen/soziales/aktionsplan-soziale-stadt/' target='_blank' rel='noopener noreferrer'>Aktionsplan Soziale Stadt Dortmund</a>.
+				 * Stadtteile sind kleinere, lebensnahe Einheiten innerhalb der Stadtbezirke. Aktionsräume markieren Bereiche mit besonderem sozialen Förderbedarf. Diese stammen aus dem <a class='focusable transition-opacity hover:opacity-50 underline decoration-primary underline-offset-4' href='https://www.dortmund.de/themen/soziales/aktionsplan-soziale-stadt/' target='_blank' rel='noopener noreferrer'>Aktionsplan Soziale Stadt Dortmund</a>.
 				 */
 				description: () => LocalizedString
 			}

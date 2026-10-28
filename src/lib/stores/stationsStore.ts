@@ -1,6 +1,7 @@
-import { browser } from '$app/environment';
+import { browser } from '$app/env';
 import { writable } from 'svelte/store';
-import { queryParam, ssp } from 'sveltekit-search-params';
+import { ssp } from 'sveltekit-search-params';
+import { queryParam } from './queryParam.svelte';
 import type { StationsGeoJSONType } from './mapData';
 
 const defaultStations = ['DOBHBF', 'DODFRP', 'DODGWS'];

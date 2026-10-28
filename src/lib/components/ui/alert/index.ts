@@ -1,6 +1,6 @@
 import { type VariantProps, tv } from 'tailwind-variants';
 
-import { cn } from '$lib/utils';
+import { cn } from '#lib/utils.js';
 import Description from './alert-description.svelte';
 import Title from './alert-title.svelte';
 import Root from './alert.svelte';

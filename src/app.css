@@ -1,6 +1,81 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/typography';
+
+@custom-variant dark (&:is(.dark *));
+/* `hover:` only applies on devices that can hover, but e.g. `group-has-[button:hover]:` does not */
+@custom-variant hover-hover (@media (hover: hover));
+
+@utility container {
+	margin-inline: auto;
+	padding-inline: 2rem;
+	@media (width >= --theme(--breakpoint-xs)) {
+		max-width: none;
+	}
+	@media (width >= 1400px) {
+		max-width: 1400px;
+	}
+}
+
+@theme {
+	--breakpoint-xs: 375px;
+
+	/* the system font: the default of tailwind 4.3 lists named fonts and no longer system-ui */
+	--font-sans:
+		ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+		'Noto Color Emoji';
+
+	--radius-lg: var(--radius);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-sm: calc(var(--radius) - 4px);
+
+	--color-border: hsl(var(--border));
+	--color-input: hsl(var(--input));
+	--color-ring: hsl(var(--ring));
+	--color-background: hsl(var(--background));
+	--color-foreground: hsl(var(--foreground));
+
+	--color-primary: hsl(var(--primary));
+	--color-primary-foreground: hsl(var(--primary-foreground));
+
+	--color-secondary: hsl(var(--secondary));
+	--color-secondary-foreground: hsl(var(--secondary-foreground));
+
+	--color-destructive: hsl(var(--destructive));
+	--color-destructive-foreground: hsl(var(--destructive-foreground));
+
+	--color-warning: hsl(var(--warning));
+	--color-warning-foreground: hsl(var(--warning-foreground));
+
+	--color-muted: hsl(var(--muted));
+	--color-muted-foreground: hsl(var(--muted-foreground));
+
+	--color-accent: hsl(var(--accent));
+	--color-accent-foreground: hsl(var(--accent-foreground));
+
+	--color-popover: hsl(var(--popover));
+	--color-popover-foreground: hsl(var(--popover-foreground));
+
+	--color-card: hsl(var(--card));
+	--color-card-foreground: hsl(var(--card-foreground));
+}
+
+/*
+  the colors layerchart styles its axes, tooltips and highlights with (besides --color-primary);
+  static: emitted although no utility uses them
+*/
+@theme static {
+	--color-surface-100: hsl(var(--background));
+	--color-surface-200: hsl(var(--muted));
+	--color-surface-300: hsl(var(--secondary-foreground));
+	--color-surface-content: hsl(var(--muted-foreground));
+}
+
+@utility focusable {
+	@apply focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden;
+	@apply focus-within:border-border focus-visible:bg-background focus-visible:text-foreground;
+	@apply focus-visible:rounded focus-visible:ring-offset-4 focus-visible:ring-offset-background;
+}
 
 @layer base {
 	html {
@@ -98,121 +173,45 @@
 		--ring: var(--primary);
 	}
 
-	:root {
-		--color-primary: var(--primary);
-		--color-secondary: var(--secondary);
-		--color-secondary-content: var(--secondary-foreground);
-		--color-accent: var(--accent);
-		--color-neutral: var(--muted-foreground);
-		--color-neutral-content: var(--muted);
-		--color-surface-100: var(--background);
-		--color-surface-200: var(--muted);
-		--color-surface-300: var(--secondary-foreground);
-		--color-surface-content: var(--muted-foreground);
-		--color-info: var(--primary);
-		--color-success: var(--primary);
-		--color-warning: var(--warning);
-		--color-danger: var(--destructive);
-		--color-primary-content: var(--primary-foreground);
-		--color-primary-50: var(--primary);
-		--color-primary-100: var(--primary);
-		--color-primary-200: var(--primary);
-		--color-primary-300: var(--primary);
-		--color-primary-400: var(--primary);
-		--color-primary-500: var(--primary);
-		--color-primary-600: var(--primary);
-		--color-primary-700: var(--primary);
-		--color-primary-800: var(--primary);
-		--color-primary-900: var(--primary);
-		--color-secondary-50: var(--secondary);
-		--color-secondary-100: var(--secondary);
-		--color-secondary-200: var(--secondary);
-		--color-secondary-300: var(--secondary);
-		--color-secondary-400: var(--secondary);
-		--color-secondary-500: var(--secondary);
-		--color-secondary-600: var(--secondary);
-		--color-secondary-700: var(--secondary);
-		--color-secondary-800: var(--secondary);
-		--color-secondary-900: var(--secondary);
-		--color-accent-content: var(--accent-foreground);
-		--color-accent-50: var(--accent);
-		--color-accent-100: var(--accent);
-		--color-accent-200: var(--accent);
-		--color-accent-300: var(--accent);
-		--color-accent-400: var(--accent);
-		--color-accent-500: var(--accent);
-		--color-accent-600: var(--accent);
-		--color-accent-700: var(--accent);
-		--color-accent-800: var(--accent);
-		--color-accent-900: var(--accent);
-		--color-neutral-50: var(--muted-foreground);
-		--color-neutral-100: var(--muted-foreground);
-		--color-neutral-200: var(--muted-foreground);
-		--color-neutral-300: var(--muted-foreground);
-		--color-neutral-400: var(--muted-foreground);
-		--color-neutral-500: var(--muted-foreground);
-		--color-neutral-600: var(--muted-foreground);
-		--color-neutral-700: var(--muted-foreground);
-		--color-neutral-800: var(--muted-foreground);
-		--color-neutral-900: var(--muted-foreground);
-		--color-info-content: var(--primary-foreground);
-		--color-info-50: var(--primary);
-		--color-info-100: var(--primary);
-		--color-info-200: var(--primary);
-		--color-info-300: var(--primary);
-		--color-info-400: var(--primary);
-		--color-info-500: var(--primary);
-		--color-info-600: var(--primary);
-		--color-info-700: var(--primary);
-		--color-info-800: var(--primary);
-		--color-info-900: var(--primary);
-		--color-success-content: var(--primary-foreground);
-		--color-success-50: var(--primary);
-		--color-success-100: var(--primary);
-		--color-success-200: var(--primary);
-		--color-success-300: var(--primary);
-		--color-success-400: var(--primary);
-		--color-success-500: var(--primary);
-		--color-success-600: var(--primary);
-		--color-success-700: var(--primary);
-		--color-success-800: var(--primary);
-		--color-success-900: var(--primary);
-		--color-warning-content: var(--warning-foreground);
-		--color-warning-50: var(--warning);
-		--color-warning-100: var(--warning);
-		--color-warning-200: var(--warning);
-		--color-warning-300: var(--warning);
-		--color-warning-400: var(--warning);
-		--color-warning-500: var(--warning);
-		--color-warning-600: var(--warning);
-		--color-warning-700: var(--warning);
-		--color-warning-800: var(--warning);
-		--color-warning-900: var(--warning);
-		--color-danger-content: var(--destructive-foreground);
-		--color-danger-50: var(--destructive);
-		--color-danger-100: var(--destructive);
-		--color-danger-200: var(--destructive);
-		--color-danger-300: var(--destructive);
-		--color-danger-400: var(--destructive);
-		--color-danger-500: var(--destructive);
-		--color-danger-600: var(--destructive);
-		--color-danger-700: var(--destructive);
-		--color-danger-800: var(--destructive);
-		--color-danger-900: var(--destructive);
-	}
-
-	* {
+	/* tailwind 4 defaults the border color to currentcolor */
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
 		@apply border-border;
 	}
+
+	/* tailwind 4 resets the cursor of buttons to default */
+	button:not(:disabled),
+	[role='button']:not(:disabled) {
+		cursor: pointer;
+	}
+
 	body {
 		@apply bg-background text-foreground;
 	}
 }
 
-@layer components {
-	.focusable {
-		@apply focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring;
-		@apply focus-within:border-border focus-visible:bg-background focus-visible:text-foreground;
-		@apply focus-visible:rounded focus-visible:ring-offset-4 focus-visible:ring-offset-background;
+/* prose keeps the text color of the page, as with tailwind 3 (the plugin defaults to grays) */
+@layer utilities {
+	.prose {
+		--tw-prose-body: currentColor;
+		--tw-prose-headings: currentColor;
+		--tw-prose-lead: currentColor;
+		--tw-prose-links: currentColor;
+		--tw-prose-bold: currentColor;
+		--tw-prose-counters: currentColor;
+		--tw-prose-bullets: currentColor;
+		--tw-prose-hr: currentColor;
+		--tw-prose-quotes: currentColor;
+		--tw-prose-quote-borders: currentColor;
+		--tw-prose-captions: currentColor;
+		--tw-prose-kbd: currentColor;
+		--tw-prose-code: currentColor;
+		--tw-prose-pre-code: currentColor;
+		--tw-prose-pre-bg: transparent;
+		--tw-prose-th-borders: currentColor;
+		--tw-prose-td-borders: currentColor;
 	}
 }

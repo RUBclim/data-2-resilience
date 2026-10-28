@@ -1,6 +1,6 @@
 <script lang="ts">
-	import LL from '$i18n/i18n-svelte';
-	import { cn } from '$lib/utils';
+	import LL from '#i18n/i18n-svelte.js';
+	import { cn } from '#lib/utils.js';
 
 	interface Props {
 		className?: string;

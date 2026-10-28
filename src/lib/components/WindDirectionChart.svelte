@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { LL, locale } from '$i18n/i18n-svelte';
-	import { stations } from '$lib/stores/mapData';
-	import { unit } from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
-	import { CHART_COLORS } from '$lib/utils/chartUtils';
+	import { LL, locale } from '#i18n/i18n-svelte.js';
+	import { stations } from '#lib/stores/mapData.js';
+	import { unit } from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
+	import { CHART_COLORS } from '#lib/utils/chartUtils.js';
 	import { scaleLinear, type ScaleLinear, scaleOrdinal, scaleTime } from 'd3-scale';
 	import { Axis, Chart, Highlight, Legend, Svg, Tooltip } from 'layerchart';
-	import { LoaderCircle } from 'lucide-svelte';
+	import { LoaderCircle } from '@lucide/svelte';
 	import ErrorAlert from './ErrorAlert.svelte';
 	import { tooltipClasses } from './Histogram/HistogramTooltip.svelte';
 
@@ -97,96 +97,98 @@
 			{yScale}
 			yNice
 			{padding}
-			tooltip={{ mode: 'bisect-x' }}
-			let:yScale={chartYScale}
-			let:xScale={chartXScale}
+			tooltipContext={{ mode: 'bisect-x' }}
 		>
-			{@const scaleY = chartYScale as ScaleLinear<number, number>}
-			{@const scaleX = chartXScale as ScaleLinear<number, number>}
-			<Svg>
-				<Axis
-					placement="left"
-					rule
-					grid
-					classes={{ tickLabel: 'text-xs' }}
-					tickLabelProps={{ dx: -8 }}
-					format={yTickFormat}
-					ticks={[0, 90, 180, 270, 360]}
-					scale={scaleY}
-				/>
-				<Axis
-					placement="bottom"
-					format={xTickFormat}
-					rule
-					classes={{ tickLabel: 'text-xs' }}
-					tickLabelProps={{ dy: 8 }}
-					ticks={4}
-				/>
-				<Highlight
-					lines={{
-						stroke: 'hsl(var(--muted-foreground))',
-						strokeWidth: 1
-					}}
-				/>
-				{#each stationNames as name}
+			{#snippet children({ context })}
+				{@const scaleY = context.yScale as ScaleLinear<number, number>}
+				{@const scaleX = context.xScale as ScaleLinear<number, number>}
+				<Svg>
+					<Axis
+						placement="left"
+						rule
+						grid
+						classes={{ tickLabel: 'text-xs' }}
+						tickLabelProps={{ dx: -8 }}
+						format={yTickFormat}
+						ticks={[0, 90, 180, 270, 360]}
+						scale={scaleY}
+					/>
+					<Axis
+						placement="bottom"
+						format={xTickFormat}
+						rule
+						classes={{ tickLabel: 'text-xs' }}
+						tickLabelProps={{ dy: 8 }}
+						ticks={4}
+					/>
 					<Highlight
-						y={(d) => d[name]}
-						points={{
-							fill: 'hsl(var(--background))',
-							fillOpacity: 1,
-							stroke: 'hsl(var(--muted-foreground)) !important',
-							strokeWidth: 1,
-							r: 10
+						lines={{
+							stroke: 'hsl(var(--muted-foreground))',
+							strokeWidth: 1
 						}}
 					/>
-				{/each}
-				<defs>
-					<g id="windarrow">
-						<path
-							d="M7.39242 13V4.22136L3.86957 7.6068L3 6.78447L8.00558 2L13 6.78447L12.1527 7.6068L8.61873 4.22136V13H7.39242Z"
-						/>
-					</g>
-				</defs>
-				{#each stationNames as name, idx}
-					{#each data as item}
-						{@const value = item[name] as number}
-						<path
-							d="M7.39242 13V4.22136L3.86957 7.6068L3 6.78447L8.00558 2L13 6.78447L12.1527 7.6068L8.61873 4.22136V13H7.39242Z"
-							transform-origin="8 8"
-							transform={`translate(${scaleX(item.date) - 8}, ${scaleY(value) - 8}) rotate(${value + 180})`}
-							style={`fill: ${CHART_COLORS[idx]};`}
-							fill={CHART_COLORS[idx]}
-							color={CHART_COLORS[idx]}
+					{#each stationNames as name}
+						<Highlight
+							y={(d) => d[name]}
+							points={{
+								fill: 'hsl(var(--background))',
+								fillOpacity: 1,
+								stroke: 'hsl(var(--muted-foreground))',
+								strokeWidth: 1,
+								r: 10
+							}}
 						/>
 					{/each}
-				{/each}
-			</Svg>
+					<defs>
+						<g id="windarrow">
+							<path
+								d="M7.39242 13V4.22136L3.86957 7.6068L3 6.78447L8.00558 2L13 6.78447L12.1527 7.6068L8.61873 4.22136V13H7.39242Z"
+							/>
+						</g>
+					</defs>
+					{#each stationNames as name, idx}
+						{#each data as item}
+							{@const value = item[name] as number}
+							<path
+								d="M7.39242 13V4.22136L3.86957 7.6068L3 6.78447L8.00558 2L13 6.78447L12.1527 7.6068L8.61873 4.22136V13H7.39242Z"
+								transform-origin="8 8"
+								transform={`translate(${scaleX(item.date) - 8}, ${scaleY(value) - 8}) rotate(${value + 180})`}
+								style={`fill: ${CHART_COLORS[idx]};`}
+								fill={CHART_COLORS[idx]}
+								color={CHART_COLORS[idx]}
+							/>
+						{/each}
+					{/each}
+				</Svg>
 
-			<Legend
-				scale={cScale}
-				variant="swatches"
-				tickFormat={(d) =>
-					$stations.features.find((f) => f.properties.id === d)?.properties.longName || d}
-				classes={{
-					root: 'absolute inset-x-0 bottom-0',
-					swatches: 'items-center justify-center w-full flex flex-wrap gap-x-4',
-					swatch: 'w-3 h-0.5',
-					item: () => 'flex items-center gap-x-2',
-					label: 'chart-legend-label' // Needed to offset the labels in the export
-				}}
-			/>
-			<Tooltip.Root
-				let:data
-				classes={{
-					...tooltipClasses,
-					root: cn(tooltipClasses.root, 'w-64', 'mt-24')
-				}}
-				xOffset={10}
-				anchor={'right'}
-				contained="window"
-			>
-				{@html tooltipTemplate(data)}
-			</Tooltip.Root>
+				<Legend
+					scale={cScale}
+					variant="swatches"
+					tickFormat={(d) =>
+						$stations.features.find((f) => f.properties.id === d)?.properties.longName || d}
+					classes={{
+						root: 'absolute inset-x-0 bottom-0',
+						items: 'items-center justify-center w-full flex flex-wrap gap-x-4',
+						swatch: 'w-3 h-0.5',
+						item: () => 'flex items-center gap-x-2',
+						label: 'chart-legend-label' // Needed to offset the labels in the export
+					}}
+				/>
+				<Tooltip.Root
+					classes={{
+						...tooltipClasses,
+						root: cn(tooltipClasses.root, 'w-64', 'mt-24')
+					}}
+					xOffset={10}
+					anchor={'right'}
+					contained="window"
+					portal={false}
+				>
+					{#snippet children({ data })}
+						{@html tooltipTemplate(data)}
+					{/snippet}
+				</Tooltip.Root>
+			{/snippet}
 		</Chart>
 	{:else if !error && !isLoading && data && data.length === 0}
 		<div class="absolute inset-0 flex items-center justify-center">

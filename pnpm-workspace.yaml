@@ -1,0 +1,21 @@
+# Security overrides for transitive dependencies whose parents pin a vulnerable range.
+# Remove an entry once its parent ships a fixed range (check with `pnpm why <pkg>`).
+overrides:
+  # GHSA-rj75-hqrm-r3gf, @tailwindcss/typography pins 6.x;
+  # 7.0's only breaking change is safe insertion during iteration
+  'postcss-selector-parser@<7.1.6': ^7.1.7
+
+# pnpm only installs versions published at least a day ago (minimumReleaseAge); exceptions
+# are for security fixes only, exact versions, and can go once they are older than a day
+minimumReleaseAgeExclude: []
+
+peerDependencyRules:
+  allowedVersions:
+    # runed (via bits-ui) only needs kit for its `runed/kit` helpers, which bits-ui doesn't use
+    'runed>@sveltejs/kit': '3'
+
+# install scripts stay disabled: esbuild and @sentry/cli ship their binaries as optional
+# platform packages, so their postinstall fallbacks are not needed
+allowBuilds:
+  '@sentry/cli': false
+  esbuild: false

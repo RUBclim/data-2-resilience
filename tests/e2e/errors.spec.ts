@@ -61,9 +61,7 @@ test.describe('station snapshot failures', () => {
 			route.fulfill({ json: snapshot(null) })
 		);
 		await open(page, '/en');
-		await expect(datavis(page).locator('svg.layercake-layout-svg').first()).toContainText(
-			'Hauptbahnhof'
-		);
+		await expect(datavis(page).locator('svg.lc-layout-svg').first()).toContainText('Hauptbahnhof');
 	});
 
 	for (const [direction, visualization, min, max] of [

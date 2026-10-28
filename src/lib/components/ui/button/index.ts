@@ -1,9 +1,10 @@
-import type { Button as ButtonPrimitive } from 'bits-ui';
+import type { Snippet } from 'svelte';
+import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 import { type VariantProps, tv } from 'tailwind-variants';
 import Root from './button.svelte';
 
 const buttonVariants = tv({
-	base: 'ring-offset-background focus-visible:ring-ring inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+	base: 'ring-offset-background focus-visible:ring-ring inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
 	variants: {
 		variant: {
 			default: 'bg-primary text-primary-foreground hover:bg-primary/90',
@@ -29,20 +30,21 @@ const buttonVariants = tv({
 type Variant = VariantProps<typeof buttonVariants>['variant'];
 type Size = VariantProps<typeof buttonVariants>['size'];
 
-type Props = ButtonPrimitive.Props & {
-	variant?: Variant;
-	size?: Size;
-};
-
-type Events = ButtonPrimitive.Events;
+// renders an `<a>` with `href`, a `<button>` otherwise
+type Props = Omit<HTMLButtonAttributes, 'type'> &
+	Omit<HTMLAnchorAttributes, 'type'> & {
+		type?: HTMLButtonAttributes['type'];
+		variant?: Variant;
+		size?: Size;
+		ref?: HTMLElement | null;
+		children?: Snippet;
+	};
 
 export {
 	//
 	Root as Button,
 	Root,
 	buttonVariants,
-	type Events as ButtonEvents,
 	type Props as ButtonProps,
-	type Events,
 	type Props
 };

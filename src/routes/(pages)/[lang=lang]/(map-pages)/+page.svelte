@@ -1,10 +1,10 @@
 <script lang="ts">
-	import LL from '$i18n/i18n-svelte';
-	import type { StationsGeoJSONType } from '$lib/stores/mapData';
-	import CollapsibleParagraph from 'components/CollapsibleParagraph.svelte';
-	import StationsSelect from 'components/StationsSelect.svelte';
-	import UnitDataVis from 'components/UnitDataVis.svelte';
-	import UnitSelect from 'components/UnitSelect.svelte';
+	import LL from '#i18n/i18n-svelte.js';
+	import type { StationsGeoJSONType } from '#lib/stores/mapData.js';
+	import CollapsibleParagraph from '#lib/components/CollapsibleParagraph.svelte';
+	import StationsSelect from '#lib/components/StationsSelect.svelte';
+	import UnitDataVis from '#lib/components/UnitDataVis.svelte';
+	import UnitSelect from '#lib/components/UnitSelect.svelte';
 	import type { PageData } from './$types';
 
 	interface Props {

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { cn } from '$lib/utils';
-	import { Check } from 'lucide-svelte';
+	import { cn } from '#lib/utils.js';
+	import { Check } from '@lucide/svelte';
 
 	interface Props {
 		checked?: boolean;

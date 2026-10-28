@@ -1,15 +1,13 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { PUBLIC_GEOCODING_URL } from '$env/static/public';
-	import { LL } from '$i18n/i18n-svelte';
-	import * as Popover from '$lib/components/ui/popover';
-	import { cn } from '$lib/utils';
-	import { reactiveQueryArgs } from '$lib/utils/queryUtils.svelte';
-	import { debounceState } from '$lib/utils/runeUtil.svelte';
-	import { responseSchema, type AddressFeature } from '$lib/utils/searchUtil';
+	import { browser } from '$app/env';
+	import { PUBLIC_GEOCODING_URL } from '$app/env/public';
+	import { LL } from '#i18n/i18n-svelte.js';
+	import { cn, flyAndScale } from '#lib/utils.js';
+	import { debounceState } from '#lib/utils/runeUtil.svelte.js';
+	import { responseSchema, type AddressFeature } from '#lib/utils/searchUtil.js';
 	import { createQuery, type QueryFunctionContext, type QueryKey } from '@tanstack/svelte-query';
-	import SearchInputField from 'components/SearchInputField.svelte';
-	import { Command, CommandEmpty, CommandItem } from 'components/ui/command';
+	import SearchInputField from '#lib/components/SearchInputField.svelte';
+	import { Command, CommandEmpty, CommandItem } from '#lib/components/ui/command/index.js';
 	import { onDestroy, onMount } from 'svelte';
 
 	const {
@@ -53,34 +51,30 @@
 		if (!browser) return;
 		document.removeEventListener('click', onClickAnywhere);
 	});
+
 	// --------------
+	const searchResultsQuery = createQuery(() => ({
+		queryKey: ['addressSearch', debouncedQuery?.trim(), wasInputed],
+		queryFn: async ({ queryKey: [_, searchTerm, wasInputed] }: QueryFunctionContext<QueryKey>) => {
+			if (!searchTerm || !wasInputed) return [];
+			const query = encodeURIComponent(`${searchTerm}`.trim());
+			const response = await fetch(`${PUBLIC_GEOCODING_URL}?query=${query}&outputformat=JSON`);
 
-	const searchResultsQuery = createQuery(
-		reactiveQueryArgs(() => ({
-			queryKey: ['addressSearch', debouncedQuery?.trim(), wasInputed],
-			queryFn: async ({
-				queryKey: [_, searchTerm, wasInputed]
-			}: QueryFunctionContext<QueryKey>) => {
-				if (!searchTerm || !wasInputed) return [];
-				const query = encodeURIComponent(`${searchTerm}`.trim());
-				const response = await fetch(`${PUBLIC_GEOCODING_URL}?query=${query}&outputformat=JSON`);
-
-				if (!response.ok) {
-					console.error(`Geocoding error: ${response.status} ${response.statusText}`);
-					throw new Error(`Geocoding error: ${response.status} ${response.statusText}`);
-				}
-
-				const data = await response.json();
-				const parsedData = responseSchema.safeParse(data).data?.features || [];
-				if (parsedData.length === 0) return [];
-				const validResults = parsedData
-					.filter((f) => f.properties.text && f.geometry.coordinates.length === 2)
-					.sort((f1, f2) => f2.properties.score - f1.properties.score);
-				return validResults;
+			if (!response.ok) {
+				console.error(`Geocoding error: ${response.status} ${response.statusText}`);
+				throw new Error(`Geocoding error: ${response.status} ${response.statusText}`);
 			}
-		}))
-	);
-	const { isLoading, isError, data = [] } = $derived($searchResultsQuery);
+
+			const data = await response.json();
+			const parsedData = responseSchema.safeParse(data).data?.features || [];
+			if (parsedData.length === 0) return [];
+			const validResults = parsedData
+				.filter((f) => f.properties.text && f.geometry.coordinates.length === 2)
+				.sort((f1, f2) => f2.properties.score - f1.properties.score);
+			return validResults;
+		}
+	}));
+	const { isLoading, isError, data = [] } = $derived(searchResultsQuery);
 	const isEmpty = $derived(!isLoading && data.length === 0);
 	const showPopover = $derived(
 		wasInputed &&
@@ -152,33 +146,36 @@
 
 <div
 	id="map-search"
-	class={cn('fixed right-20 top-[calc(var(--headerHeight,5rem)+0.75rem)] z-10 w-64 transition')}
+	class={cn('fixed top-[calc(var(--headerHeight,5rem)+0.75rem)] right-20 z-10 w-64 transition')}
 	bind:this={container}
 >
 	<div class="relative">
-		<Popover.Root open={suggesitonsOpened}>
-			<Popover.Trigger asChild>
-				<SearchInputField
-					placeholder={$LL.map.search.placeholder()}
-					value={internalSearchQuery}
-					onchange={(newVal) => {
-						internalSearchQuery = newVal;
-						onSearchQueryChanged(internalSearchQuery);
-						suggesitonsOpened = showPopover;
-						wasInputed = true;
-					}}
-					classNames={{
-						input: cn('shadow-lg shadow-black/5 dark:shadow-black/80'),
-						container: cn('max-w-64 justify-end')
-					}}
-					{onKeyDown}
-					onFocus={() => (suggesitonsOpened = showPopover)}
-				/>
-			</Popover.Trigger>
-			<Popover.Content
-				class="absolute right-0 top-full !block min-w-64 max-w-96 translate-y-1.5 p-0"
-				side="bottom"
-				align="end"
+		<SearchInputField
+			placeholder={$LL.map.search.placeholder()}
+			value={internalSearchQuery}
+			onchange={(newVal) => {
+				internalSearchQuery = newVal;
+				onSearchQueryChanged(internalSearchQuery);
+				suggesitonsOpened = showPopover;
+				wasInputed = true;
+			}}
+			classNames={{
+				input: cn('shadow-lg shadow-black/5 dark:shadow-black/80'),
+				container: cn('max-w-64 justify-end')
+			}}
+			{onKeyDown}
+			onFocus={() => (suggesitonsOpened = showPopover)}
+		/>
+		<!-- the popover of bits-ui 0.x without a trigger element: neither positioned, portalled nor modal -->
+		{#if suggesitonsOpened}
+			<div
+				role="dialog"
+				tabindex="-1"
+				class={cn(
+					'z-50 w-72 rounded-md border bg-popover text-popover-foreground shadow-md outline-hidden',
+					'absolute top-full right-0 block! max-w-96 min-w-64 translate-y-1.5 p-0'
+				)}
+				transition:flyAndScale
 			>
 				<Command bind:value={command}>
 					{#if isLoading}
@@ -194,7 +191,7 @@
 							class={cn(
 								'bg-none font-sans text-base',
 								'border-t border-border px-4 py-3 text-base leading-5',
-								'focusable text-left hover-hover:hover:bg-muted',
+								'focusable text-left hover:bg-muted',
 								'focus-visible:z-50 focus-visible:border-background'
 							)}
 							onSelect={() => handleSelect(feature)}
@@ -203,7 +200,7 @@
 						</CommandItem>
 					{/each}
 				</Command>
-			</Popover.Content>
-		</Popover.Root>
+			</div>
+		{/if}
 	</div>
 </div>

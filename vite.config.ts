@@ -1,5 +1,9 @@
-import { sentrySvelteKit } from '@sentry/sveltekit';
+import { sentrySvelteKit } from '@sentry/sveltekit/vite';
+import nodeAdapter from '@sveltejs/adapter-node';
+import vercelAdapter from '@sveltejs/adapter-vercel';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import tailwindcss from '@tailwindcss/vite';
 import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
 
@@ -19,12 +23,15 @@ export default defineConfig(({ mode }) => ({
 			// the generated load() wrappers map onto the route files and would show up as
 			// uncoverable code; with the empty test DSN they are no-ops anyway
 			autoInstrument: mode !== 'test',
-			sourceMapsUploadOptions: {
-				org: 'rubclim',
-				project: 'd2r-dashboard'
-			}
+			org: 'rubclim',
+			project: 'd2r-dashboard'
 		}),
-		sveltekit()
+		tailwindcss(),
+		sveltekit({
+			preprocess: vitePreprocess(),
+			// the docker image runs the node server, everything else is deployed to vercel
+			adapter: process.env.IS_DOCKER ? nodeAdapter() : vercelAdapter()
+		})
 	],
 	test: {
 		expect: { requireAssertions: true },

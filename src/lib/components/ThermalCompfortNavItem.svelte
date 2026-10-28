@@ -1,9 +1,6 @@
 <script module lang="ts">
 	export type SelectedIndicatorSlugType =
-		| 'relative_humidity'
-		| 'utci'
-		| 'utci_category'
-		| 'air_temperature';
+		'relative_humidity' | 'utci' | 'utci_category' | 'air_temperature';
 	export type IndicatorType = {
 		slug: 'utci' | 'relative_humidity' | 'air_temperature';
 		title: string;
@@ -14,11 +11,10 @@
 </script>
 
 <script lang="ts">
-	import { PUBLIC_ENABLE_HEATATLAS_TIMESLIDER } from '$env/static/public';
-
-	import { LL } from '$i18n/i18n-svelte';
-	import { heatStressUnit, updateHeatStressUnit } from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
+	import { PUBLIC_ENABLE_HEATATLAS_TIMESLIDER } from '$app/env/public';
+	import { LL } from '#i18n/i18n-svelte.js';
+	import { heatStressUnit, updateHeatStressUnit } from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
 	import InfoTooltip from './InfoTooltip.svelte';
 
 	const showTimeslider = PUBLIC_ENABLE_HEATATLAS_TIMESLIDER === 'true';
@@ -54,7 +50,7 @@
 				updateHeatStressUnit(indicator.hasCategory ? slugWithCategory : indicator.slug);
 			}}
 			class={cn(
-				'focusable absolute inset-0 z-10 focus-visible:rounded-xl focus-visible:bg-transparent'
+				'absolute inset-0 z-10 focusable focus-visible:rounded-xl focus-visible:bg-transparent'
 			)}
 		></button>
 		<div class="relative flex w-full items-center justify-between gap-4 pr-8 font-semibold">
@@ -68,8 +64,8 @@
 			</div>
 			<span
 				class={cn(
-					'absolute right-0 top-0 bg-background',
-					'size-5 rounded-full border border-muted-foreground ring-4 ring-inset ring-background',
+					'absolute top-0 right-0 bg-background',
+					'size-5 rounded-full border border-muted-foreground ring-4 ring-background ring-inset',
 					indicator.isSelected && 'border-primary bg-primary-foreground ring-primary'
 				)}
 			></span>
@@ -92,7 +88,7 @@
 								'relative z-20',
 								categorySelected &&
 									'border-primary bg-primary font-semibold text-primary-foreground group-hover/indicators:bg-primary group-hover/indicators:text-primary-foreground',
-								!categorySelected && 'group-hover/indicators:hover:bg-background'
+								!categorySelected && 'hover:group-hover/indicators:bg-background'
 							)}
 						>
 							{$LL.indicators.utci.types.byClass.title()}
@@ -113,7 +109,7 @@
 								'relative z-20',
 								valueSelected &&
 									'border-primary bg-primary font-semibold text-primary-foreground group-hover/indicators:bg-primary group-hover/indicators:text-primary-foreground',
-								!valueSelected && 'group-hover/indicators:hover:bg-background'
+								!valueSelected && 'hover:group-hover/indicators:bg-background'
 							)}
 						>
 							{$LL.indicators.utci.types.byValue.title()}

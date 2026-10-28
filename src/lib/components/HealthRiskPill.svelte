@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { LL } from '$i18n/i18n-svelte';
-	import type { StationsGeoJSONType } from '$lib/stores/mapData';
-	import { unit } from '$lib/stores/uiStore';
-	import { getHealthRiskPill } from '$lib/utils/healthRisksUtil';
-	import { reactiveQueryArgs } from '$lib/utils/queryUtils.svelte';
-	import { useStationsSnapshotConfig } from '$lib/utils/useStationsSnapshot';
+	import { LL } from '#i18n/i18n-svelte.js';
+	import type { StationsGeoJSONType } from '#lib/stores/mapData.js';
+	import { unit } from '#lib/stores/uiStore.js';
+	import { getHealthRiskPill } from '#lib/utils/healthRisksUtil.js';
+	import { useStationsSnapshotConfig } from '#lib/utils/useStationsSnapshot.js';
 	import { createQuery } from '@tanstack/svelte-query';
 
 	type Props = {
@@ -19,7 +18,7 @@
 	const stationsSnapshotQueryConfig = $derived.by(() =>
 		useStationsSnapshotConfig({ initialStationIds, stations })
 	);
-	const snapshotQuery = createQuery(reactiveQueryArgs(() => $stationsSnapshotQueryConfig));
+	const snapshotQuery = createQuery(() => $stationsSnapshotQueryConfig);
 
 	const pill = $derived(
 		getHealthRiskPill({
@@ -27,8 +26,8 @@
 			unit: $unit,
 			LL: $LL,
 			withLabel,
-			min: $snapshotQuery.data?.scaleMin ?? null,
-			max: $snapshotQuery.data?.scaleMax ?? null
+			min: snapshotQuery.data?.scaleMin ?? null,
+			max: snapshotQuery.data?.scaleMax ?? null
 		})
 	);
 </script>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { cn } from '$lib/utils.js';
+	import { cn } from '#lib/utils.js';
 	import type { Snippet } from 'svelte';
 
 	let {
@@ -13,6 +13,6 @@
 	} = $props();
 </script>
 
-<td class={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)} {...restProps}>
+<td class={cn('p-4 align-middle has-[[role=checkbox]]:pr-0', className)} {...restProps}>
 	{@render children?.()}
 </td>

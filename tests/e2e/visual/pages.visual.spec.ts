@@ -76,7 +76,7 @@ for (const [name, url] of [
 	test(name, async ({ page }) => {
 		await open(page, url);
 		const histogram = page.locator('#stations-histogram');
-		await expect(histogram.locator('.tooltip-rects rect').first()).toBeAttached();
+		await expect(histogram.locator('.lc-tooltip-rect').first()).toBeAttached();
 		await histogram.evaluate((el) => el.scrollIntoView({ block: 'start' }));
 		await snapshot(page, name);
 	});

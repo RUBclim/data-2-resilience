@@ -1,5 +1,7 @@
-import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import { PUBLIC_API_BASE_URL } from '$app/env/public';
+
 import { addHours, format, getDayOfYear, getYear, startOfDay, startOfHour } from 'date-fns';
+
 import { z } from 'zod';
 import { fromError } from 'zod-validation-error';
 import {

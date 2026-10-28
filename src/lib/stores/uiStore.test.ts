@@ -1,21 +1,17 @@
-import { setLocale } from '$i18n/i18n-svelte';
-import { loadAllLocales } from '$i18n/i18n-util.sync';
-import type { Writable } from 'svelte/store';
+import { setLocale } from '#i18n/i18n-svelte.js';
+import { loadAllLocales } from '#i18n/i18n-util.sync.js';
 import { get } from 'svelte/store';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
-// the query param stores read the url of the SvelteKit page store
-vi.mock('$app/environment', () => ({ browser: false, building: false, dev: false, version: '' }));
+// the query param stores read the url of the SvelteKit page state
+vi.mock('$app/env', () => ({ browser: false, building: false, dev: false, version: '' }));
 vi.mock('$app/navigation', () => ({ goto: vi.fn() }));
-vi.mock('$app/stores', async () => {
-	const { writable } = await import('svelte/store');
-	return { page: writable({ url: new URL('http://localhost/en') }) };
-});
+vi.mock('$app/state', async () => ({
+	page: (await import('#lib/test-utils/page.svelte.js')).page
+}));
 
-const { page } = (await import('$app/stores')) as unknown as {
-	page: Writable<{ url: URL }>;
-};
-const openUrl = (search: string) => page.set({ url: new URL(`http://localhost/en?${search}`) });
+const { page } = await import('#lib/test-utils/page.svelte.js');
+const openUrl = (search: string) => (page.url = new URL(`http://localhost/en?${search}`));
 
 beforeAll(() => {
 	loadAllLocales();

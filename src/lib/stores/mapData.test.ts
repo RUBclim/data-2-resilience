@@ -1,9 +1,9 @@
 import { get } from 'svelte/store';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { StationMetadata } from '$lib/utils/schemas';
+import type { StationMetadata } from '#lib/utils/schemas.js';
 
 const getStationsMetadata = vi.hoisted(() => vi.fn());
-vi.mock('$lib/utils/api', () => ({ api: () => ({ getStationsMetadata }) }));
+vi.mock('#lib/utils/api.js', () => ({ api: () => ({ getStationsMetadata }) }));
 const { fetchStations, filterDoubleStations, stations } = await import('./mapData');
 
 const station = (id: string, stationType: string, longName = 'Bolmke', lat = 51.48) =>

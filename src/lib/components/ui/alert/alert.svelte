@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { cn } from '$lib/utils.js';
-	import { Info, TriangleAlert } from 'lucide-svelte';
+	import { cn } from '#lib/utils.js';
+	import { Info, TriangleAlert } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { type Variant, alertVariants } from './index.js';

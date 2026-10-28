@@ -8,10 +8,10 @@ const station = {
 	stationType: 'biomet'
 };
 const mocks = vi.hoisted(() => ({ getStationsMetadata: vi.fn(), fetchStations: vi.fn() }));
-vi.mock('$lib/utils/api', () => ({
+vi.mock('#lib/utils/api.js', () => ({
 	api: () => ({ getStationsMetadata: mocks.getStationsMetadata })
 }));
-vi.mock('$lib/stores/mapData', () => ({ fetchStations: mocks.fetchStations }));
+vi.mock('#lib/stores/mapData.js', () => ({ fetchStations: mocks.fetchStations }));
 
 const { load } = await import('./+layout.server');
 

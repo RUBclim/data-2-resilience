@@ -1,10 +1,10 @@
 <script lang="ts">
-	import LL, { locale } from '$i18n/i18n-svelte';
+	import LL, { locale } from '#i18n/i18n-svelte.js';
 	import SvelteSeo from 'svelte-seo';
 	import { replaceLocaleInUrl } from '../../utils';
 	import HeadHrefLangs from './HeadHrefLangs.svelte';
 	import { page } from '$app/state';
-	import { PUBLIC_VITE_BASE_URL as baseUrl } from '$env/static/public';
+	import { PUBLIC_VITE_BASE_URL as baseUrl } from '$app/env/public';
 </script>
 
 <svelte:head>

@@ -1,5 +1,5 @@
-import { i18n } from '$i18n/i18n-util';
-import { loadAllLocales } from '$i18n/i18n-util.sync';
+import { i18n } from '#i18n/i18n-util.js';
+import { loadAllLocales } from '#i18n/i18n-util.sync.js';
 
 loadAllLocales();
 

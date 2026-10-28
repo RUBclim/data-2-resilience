@@ -1,33 +1,50 @@
 <script lang="ts">
-	import { Popover as PopoverPrimitive } from 'bits-ui';
-	import { cn, flyAndScale } from '$lib/utils.js';
+	import { Popover as PopoverPrimitive, type WithoutChildrenOrChild } from 'bits-ui';
+	import { cn, flyAndScale } from '#lib/utils.js';
+	import type { Snippet } from 'svelte';
+	import { isNestedInPortal } from '../portal.js';
 
-	type $$Props = PopoverPrimitive.ContentProps;
-	interface Props {
-		class?: $$Props['class'];
-		transition?: $$Props['transition'];
-		transitionConfig?: $$Props['transitionConfig'];
-		children?: import('svelte').Snippet;
-		[key: string]: any;
-	}
+	type Props = WithoutChildrenOrChild<PopoverPrimitive.ContentProps> & {
+		children?: Snippet;
+	};
 
+	// collisionPadding and strategy: the defaults of bits-ui 0.x, which positioned the content so far
 	let {
 		class: className = undefined,
-		transition = flyAndScale,
-		transitionConfig = undefined,
+		collisionPadding = 8,
+		strategy = 'absolute',
 		children,
 		...rest
 	}: Props = $props();
+
+	const nested = isNestedInPortal();
 </script>
 
-<PopoverPrimitive.Content
-	{transition}
-	{transitionConfig}
-	class={cn(
-		'z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none',
-		className
-	)}
-	{...rest}
->
-	{@render children?.()}
-</PopoverPrimitive.Content>
+<!-- bits-ui 0.x portalled the content to the body (unless nested) and transitioned it on its own -->
+<PopoverPrimitive.Portal disabled={nested}>
+	<PopoverPrimitive.Content
+		forceMount
+		{collisionPadding}
+		{strategy}
+		class={cn(
+			'z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-hidden',
+			className
+		)}
+		{...rest}
+	>
+		{#snippet child({ wrapperProps, props, open })}
+			{#if open}
+				<!-- nested content was the positioned box itself, sized within its container (`max-w-full`) -->
+				<div
+					{...wrapperProps}
+					style:min-width={nested ? '0' : undefined}
+					style:max-width={nested ? '100%' : undefined}
+				>
+					<div {...props} transition:flyAndScale>
+						{@render children?.()}
+					</div>
+				</div>
+			{/if}
+		{/snippet}
+	</PopoverPrimitive.Content>
+</PopoverPrimitive.Portal>

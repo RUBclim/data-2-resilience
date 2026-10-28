@@ -1,6 +1,6 @@
-import { fetchStations } from '$lib/stores/mapData';
-import { api } from '$lib/utils/api';
-import type { StationMetadata } from '$lib/utils/schemas';
+import { fetchStations } from '#lib/stores/mapData.js';
+import { api } from '#lib/utils/api.js';
+import type { StationMetadata } from '#lib/utils/schemas.js';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ locals: { locale }, url }) => {

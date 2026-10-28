@@ -1,10 +1,10 @@
 <script lang="ts">
-	import LL from '$i18n/i18n-svelte';
-	import type { StationsGeoJSONType } from '$lib/stores/mapData';
-	import { useStations } from '$lib/stores/stationsStore';
-	import { unitWithoutCategory } from '$lib/stores/uiStore';
-	import { cn } from '$lib/utils';
-	import { getHealthRiskByKey } from '$lib/utils/healthRisksUtil';
+	import LL from '#i18n/i18n-svelte.js';
+	import type { StationsGeoJSONType } from '#lib/stores/mapData.js';
+	import { useStations } from '#lib/stores/stationsStore.js';
+	import { unitWithoutCategory } from '#lib/stores/uiStore.js';
+	import { cn } from '#lib/utils.js';
+	import { getHealthRiskByKey } from '#lib/utils/healthRisksUtil.js';
 	import HealthRiskPill from './HealthRiskPill.svelte';
 	import {
 		PopoverTooltip,
@@ -25,6 +25,7 @@
 
 	const { isLoading, stations, initialStationIds = [], data }: Props = $props();
 
+	// svelte-ignore state_referenced_locally
 	const ids = useStations({ stations });
 </script>
 
@@ -77,7 +78,7 @@
 							<strong class="flex gap-2 font-semibold">
 								<span>{healthRisk.title}</span>
 								{#if healthRisk.ranges}
-									<span class="whitespace-nowrap font-normal text-muted-foreground">
+									<span class="font-normal whitespace-nowrap text-muted-foreground">
 										({healthRisk.ranges})
 									</span>
 								{/if}

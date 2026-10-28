@@ -5,7 +5,7 @@ import {
 	PUBLIC_SENTRY_TRACES_SAMPLE_RATE,
 	PUBLIC_SENTRY_SESSION_SAMPLE_RATE,
 	PUBLIC_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE
-} from '$env/static/public';
+} from '$app/env/public';
 
 Sentry.init({
 	dsn: PUBLIC_SENTRY_DSN,

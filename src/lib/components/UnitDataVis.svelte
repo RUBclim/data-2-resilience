@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { LL } from '$i18n/i18n-svelte';
-	import type { StationsGeoJSONType } from '$lib/stores/mapData';
-	import { useStations } from '$lib/stores/stationsStore';
-	import { datavisType } from '$lib/stores/uiStore';
+	import { LL } from '#i18n/i18n-svelte.js';
+	import type { StationsGeoJSONType } from '#lib/stores/mapData.js';
+	import { useStations } from '#lib/stores/stationsStore.js';
+	import { datavisType } from '#lib/stores/uiStore.js';
 	import DailySationsValuesBarChart from './DailySationsValuesBarChart.svelte';
 	import DateRangeSlider from './DateRangeSlider.svelte';
 	import Histogram from './Histogram/Histogram.svelte';
@@ -15,6 +15,7 @@
 
 	let { stations, initialStationIds = [] }: Props = $props();
 
+	// svelte-ignore state_referenced_locally
 	const selectedStations = useStations({ initialStationIds, stations });
 </script>
 

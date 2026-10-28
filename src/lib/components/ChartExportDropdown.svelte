@@ -1,10 +1,11 @@
 <script lang="ts">
-	import LL from '$i18n/i18n-svelte';
-	import { unit } from '$lib/stores/uiStore';
-	import { today } from '$lib/utils/dateUtil';
+	import LL from '#i18n/i18n-svelte.js';
+	import { unit } from '#lib/stores/uiStore.js';
+	import { today } from '#lib/utils/dateUtil.js';
 	import { format } from 'date-fns';
-	import html2canvas from 'html2canvas';
-	import { Download, EllipsisVertical, LoaderCircle } from 'lucide-svelte';
+	// the fork of html2canvas parses the oklab() and color-mix() colors of tailwind 4
+	import html2canvas from 'html2canvas-pro';
+	import { Download, EllipsisVertical, LoaderCircle } from '@lucide/svelte';
 	import { mode } from 'mode-watcher';
 	import { Button } from './ui/button';
 	import {
@@ -49,7 +50,7 @@
 		const canvas = await html2canvas(chart, {
 			scale: 4,
 			removeContainer: true,
-			backgroundColor: $mode === 'dark' ? '#030816' : '#ffffff',
+			backgroundColor: mode.current === 'dark' ? '#030816' : '#ffffff',
 			ignoreElements: (el) => {
 				return el.classList.contains('chart-export-ignore');
 			},

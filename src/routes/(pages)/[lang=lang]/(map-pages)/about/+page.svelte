@@ -1,19 +1,17 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { LL, locale } from '$i18n/i18n-svelte';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { cn } from '$lib/utils';
-	import { Globe, Mail, X } from 'lucide-svelte';
-	import { queryParameters } from 'sveltekit-search-params';
+	import { page } from '$app/state';
+	import { LL, locale } from '#i18n/i18n-svelte.js';
+	import * as Dialog from '#lib/components/ui/dialog/index.js';
+	import { cn } from '#lib/utils.js';
+	import { Globe, Mail, X } from '@lucide/svelte';
 	import GoogleOrgLogo from './GoogleOrgLogo.svelte';
 	import ICLEILogo from './ICLEILogo.svelte';
 	import LUHLogo from './LUHLogo.svelte';
 	import RUBLogo from './RUBLogo.svelte';
 
-	let queryParams = $derived(queryParameters());
-	let urlQuery = $derived(new URLSearchParams($queryParams).toString());
-	let isAboutPage = $derived($page.url.pathname.startsWith(`/${$locale}/about`));
+	let urlQuery = $derived(page.url.searchParams.toString());
+	let isAboutPage = $derived(page.url.pathname.startsWith(`/${$locale}/about`));
 </script>
 
 <Dialog.Root
@@ -32,7 +30,7 @@
 		<Dialog.Header class={cn('relative')}>
 			<div
 				class={cn(
-					'top-0 grid grid-cols-[1fr,auto] bg-background px-6 py-4 ring-1 ring-background max-sm:sticky sm:px-8 sm:pt-6 md:px-10 md:pt-8 lg:px-12 lg:pt-10',
+					'top-0 grid grid-cols-[1fr_auto] bg-background px-6 py-4 ring-1 ring-background max-sm:sticky sm:px-8 sm:pt-6 md:px-10 md:pt-8 lg:px-12 lg:pt-10',
 					'border-border max-sm:border-b'
 				)}
 			>
@@ -41,8 +39,8 @@
 					class={cn(
 						'translate-x-1 rounded-sm transition',
 						'focusable text-muted-foreground',
-						'disabled:pointer-events-none data-[state=open]:bg-accent',
-						'data-[state=open]:text-muted-foreground hover-hover:hover:text-foreground'
+						// no data-[state=open] styles: the close button of bits-ui 0.x had no data-state (2 has)
+						'hover:text-foreground disabled:pointer-events-none'
 					)}
 				>
 					<X />
@@ -51,7 +49,7 @@
 			</div>
 			<Dialog.Description
 				class={cn(
-					'[&>a]:focusable px-6 max-sm:pt-4 sm:px-8 md:px-10 lg:px-12 [&>a]:underline',
+					'px-6 max-sm:pt-4 sm:px-8 md:px-10 lg:px-12 [&>a]:focusable [&>a]:underline',
 					'max-w-full text-left text-base text-foreground'
 				)}
 			>
@@ -61,7 +59,7 @@
 					rel="noopener noreferrer"
 					target="_blank"
 					class={cn(
-						'focusable transition-opacity hover-hover:hover:opacity-50',
+						'focusable transition-opacity hover:opacity-50',
 						'underline decoration-primary underline-offset-4',
 						'mt-4 flex items-center gap-x-2'
 					)}
@@ -74,7 +72,7 @@
 					rel="noopener noreferrer"
 					target="_blank"
 					class={cn(
-						'focusable transition-opacity hover-hover:hover:opacity-50',
+						'focusable transition-opacity hover:opacity-50',
 						'underline decoration-primary underline-offset-4',
 						'mt-2 flex items-center gap-x-2'
 					)}
@@ -85,14 +83,14 @@
 			</Dialog.Description>
 		</Dialog.Header>
 		<div
-			class="flex flex-wrap justify-between gap-x-8 gap-y-6 px-6 pb-6 pt-10 max-sm:pt-4 sm:px-8 md:px-10 lg:px-12"
+			class="flex flex-wrap justify-between gap-x-8 gap-y-6 px-6 pt-10 pb-6 max-sm:pt-4 sm:px-8 md:px-10 lg:px-12"
 		>
 			<div class={cn('flex flex-col gap-4')}>
 				<a
 					href={$LL.pages.about.logos.RUB.url()}
 					target="_blank"
 					rel="noopener noreferrer"
-					class={cn('focusable transition-opacity hover-hover:hover:opacity-50')}
+					class={cn('focusable transition-opacity hover:opacity-50')}
 				>
 					<RUBLogo className={cn('origin-top-left max-sm:scale-75')} />
 				</a>
@@ -100,7 +98,7 @@
 					href={$LL.pages.about.logos.LUH.url()}
 					target="_blank"
 					rel="noopener noreferrer"
-					class={cn('focusable transition-opacity hover-hover:hover:opacity-50')}
+					class={cn('focusable transition-opacity hover:opacity-50')}
 				>
 					<LUHLogo className={cn('origin-top-left max-sm:scale-75')} />
 				</a>
@@ -110,7 +108,7 @@
 					href={$LL.pages.about.logos.ICLEI.url()}
 					target="_blank"
 					rel="noopener noreferrer"
-					class={cn('focusable transition-opacity hover-hover:hover:opacity-50')}
+					class={cn('focusable transition-opacity hover:opacity-50')}
 				>
 					<ICLEILogo className={cn('origin-top-left max-sm:scale-75')} />
 				</a>
@@ -118,7 +116,7 @@
 					href={$LL.pages.about.logos.googleOrg.url()}
 					target="_blank"
 					rel="noopener noreferrer"
-					class={cn('focusable transition-opacity hover-hover:hover:opacity-50')}
+					class={cn('focusable transition-opacity hover:opacity-50')}
 				>
 					<GoogleOrgLogo className={cn('origin-top-left max-sm:scale-75')} />
 				</a>
@@ -135,7 +133,7 @@
 					<li>
 						<a
 							href={`/${$locale}${link.url()}?${urlQuery}`}
-							class={cn('focusable transition-colors hover-hover:hover:text-foreground')}
+							class={cn('focusable transition-colors hover:text-foreground')}
 						>
 							{link.label()}
 						</a>
