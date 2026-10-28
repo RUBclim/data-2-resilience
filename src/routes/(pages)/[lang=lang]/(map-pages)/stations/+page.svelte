@@ -14,7 +14,7 @@
 	{/each}
 </CollapsibleParagraph>
 
-<ul id="sensor-descriptions" class="mt-6 flex flex-col gap-6 scroll-mt-20">
+<ul id="sensor-descriptions" class="mt-6 flex scroll-mt-20 flex-col gap-6">
 	<SensorDescription
 		title={$LL.pages.stations.stationsDescriptions.weather.title()}
 		description={$LL.pages.stations.stationsDescriptions.weather.description()}

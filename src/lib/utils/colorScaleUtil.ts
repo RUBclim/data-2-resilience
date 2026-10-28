@@ -17,7 +17,6 @@ import {
 	isHealthRiskUnit,
 	type HealthRiskUnit
 } from './healthRisksUtil';
-import { TinyColor } from '@ctrl/tinycolor';
 
 const schemeTurboSequential: readonly string[] = quantize(interpolateTurbo, 10);
 const schemeTurboOrdinal: readonly string[] = quantize(interpolateTurbo, 10);

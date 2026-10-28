@@ -10,11 +10,10 @@
 		class?: $$Props['class'];
 		value: $$Props['value'];
 		children?: import('svelte').Snippet;
-		[key: string]: any
+		[key: string]: any;
 	}
 
 	let { class: className = undefined, value, children, ...rest }: Props = $props();
-
 </script>
 
 <DropdownMenuPrimitive.RadioItem

@@ -1,6 +1,15 @@
 <script lang="ts">
 	import { LL, locale } from '$i18n/i18n-svelte';
-	import { datavisType, dayValue, rangeEnd, rangeStart, udpateDatavisType, udpateDay, udpateRangeStart, updateRangeEnd } from '$lib/stores/uiStore';
+	import {
+		datavisType,
+		dayValue,
+		rangeEnd,
+		rangeStart,
+		udpateDatavisType,
+		udpateDay,
+		udpateRangeStart,
+		updateRangeEnd
+	} from '$lib/stores/uiStore';
 	import { cn } from '$lib/utils';
 	import { isToday, today } from '$lib/utils/dateUtil';
 	import { addDays } from 'date-fns';
@@ -14,7 +23,7 @@
 
 	let formatter = $derived((value: number) => {
 		if (Number.isNaN(value)) return '';
-		const date = addDays(today(), value === -0 ? 0 : value);
+		const date = addDays(today(), Object.is(value, -0) ? 0 : value);
 		if (isToday(date)) return $LL.pages.measurements.dateRangeSlider.today();
 		return new Intl.DateTimeFormat($locale, {
 			day: 'numeric',
@@ -82,7 +91,7 @@
 			{/if}
 		</div>
 	{/if}
-	<div class="max-xs:flex-col flex justify-center">
+	<div class="flex justify-center max-xs:flex-col">
 		<Button
 			variant={$datavisType === 'hour' ? 'default' : 'outline'}
 			size="sm"
@@ -107,7 +116,7 @@
 		>
 			{$LL.pages.measurements.dateRangeSlider.range()}
 		</Button>
-		<span class="max-xs:pt-3 flex items-center justify-center pl-2 sm:aspect-square">
+		<span class="flex items-center justify-center pl-2 max-xs:pt-3 sm:aspect-square">
 			<InfoTooltip
 				title={$LL.pages.measurements.dateRangeSlider.infoTitle()}
 				description={$LL.pages.measurements.dateRangeSlider.infoDescription()}

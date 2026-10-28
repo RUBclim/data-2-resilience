@@ -169,11 +169,11 @@
 			yNice={!isOrdinal}
 			{padding}
 			tooltip={{ mode: 'bisect-x' }}
-			let:yScale
+			let:yScale={chartYScale}
 			let:width
 			let:height
 		>
-			{@const scaleY = yScale as ScaleLinear<number, number>}
+			{@const scaleY = chartYScale as ScaleLinear<number, number>}
 			{@const scaleYDomain = scaleY.domain()}
 			<Svg>
 				<Axis

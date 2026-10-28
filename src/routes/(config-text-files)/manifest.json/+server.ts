@@ -1,22 +1,22 @@
-import type { TranslationFunctions } from "$i18n/i18n-types.js";
+import type { TranslationFunctions } from '$i18n/i18n-types.js';
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({
-    locals: { LL },
+	locals: { LL }
 }: {
-    locals: {
-        LL: TranslationFunctions;
-    };
+	locals: {
+		LL: TranslationFunctions;
+	};
 }) {
-    const body = manifest(LL);
-    const response = new Response(body);
-    response.headers.set("Cache-Control", "max-age=0, s-maxage=3600");
-    response.headers.set("Content-Type", "application/manifest+json");
-    return response;
+	const body = manifest(LL);
+	const response = new Response(body);
+	response.headers.set('Cache-Control', 'max-age=0, s-maxage=3600');
+	response.headers.set('Content-Type', 'application/manifest+json');
+	return response;
 }
 
 const manifest = (LL: TranslationFunctions) => {
-    return `
+	return `
 {
     "background_color": "${LL.themeColor()}",
     "theme_color": "${LL.themeColor()}",

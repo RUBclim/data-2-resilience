@@ -91,7 +91,9 @@
 	);
 
 	// Track configs per param to prevent cross-contamination when switching
-	let configCache = $state<Map<string, { doy: number; hour: number; param: string; year: number }>>(new Map());
+	let configCache = $state<Map<string, { doy: number; hour: number; param: string; year: number }>>(
+		new Map()
+	);
 
 	const finalConfig = $derived.by(() => {
 		if (showTimeslider) {
@@ -127,7 +129,9 @@
 	});
 
 	// Cache tilesUrls per param to prevent old sources from seeing new param's URLs
-	let tilesUrlsCache = $state<Map<string, Array<{ layerHour: number; tilesUrl: string }>>>(new Map());
+	let tilesUrlsCache = $state<Map<string, Array<{ layerHour: number; tilesUrl: string }>>>(
+		new Map()
+	);
 
 	const tilesUrls = $derived.by(() => {
 		// If no config yet, return empty array
@@ -171,7 +175,7 @@
 					'6': 'feb927',
 					'7': 'fe6e1a',
 					'8': 'c2270a',
-					'9': '900c00',
+					'9': '900c00'
 				});
 			}
 			const searchParams = new URLSearchParams(queryParameters);

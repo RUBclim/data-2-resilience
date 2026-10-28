@@ -1,0 +1,137 @@
+name: Test
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    # nightly live integration test against the real API and tile servers
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+# everything runs inside the pinned image (tests/docker/Dockerfile): screenshots are only
+# comparable with identical fonts and the same software WebGL rasterizer
+
+jobs:
+  build:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: scripts/docker.sh pnpm install --frozen-lockfile
+      - name: Build
+        run: scripts/docker.sh pnpm build:test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: build/
+          retention-days: 1
+
+  unit:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: scripts/docker.sh pnpm install --frozen-lockfile
+      - name: Unit and component tests
+        run: scripts/docker.sh pnpm test:unit
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: coverage-unit
+          path: coverage/vitest/raw/
+          retention-days: 1
+
+  e2e:
+    # one job per browser project, all in parallel
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium-desktop, chromium-mobile, firefox-desktop, firefox-mobile]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: scripts/docker.sh pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: build/
+      - name: E2E and screenshot tests (replayed, no network)
+        run: DOCKER_NETWORK=none scripts/docker.sh pnpm test:e2e --project ${{ matrix.project }}
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: coverage-${{ matrix.project }}
+          # e2e/raw (client code, chromium only) and server-v8 (SSR)
+          path: |
+            coverage/e2e/raw/
+            coverage/server-v8/
+          if-no-files-found: ignore
+          retention-days: 1
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-${{ matrix.project }}
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  coverage:
+    needs: [unit, e2e]
+    if: ${{ !cancelled() && github.event_name != 'schedule' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: scripts/docker.sh pnpm install --frozen-lockfile
+      # the SSR coverage is mapped back to the sources through the server build's source maps
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: build/
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage-unit
+          path: coverage/vitest/raw/
+      # coverage-<project>, each into coverage/jobs/<artifact>/{e2e/raw,server-v8}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*-*
+          path: coverage/jobs/
+      - name: Coverage (must not drop below the pinned values)
+        run: scripts/docker.sh pnpm coverage
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: coverage-report
+          path: coverage/merged/
+          retention-days: 14
+
+  integration:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: scripts/docker.sh pnpm install --frozen-lockfile
+      - name: Build
+        run: scripts/docker.sh pnpm build:test
+      - name: Live integration test
+        run: scripts/docker.sh pnpm test:integration
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-report
+          path: playwright-report/
+          retention-days: 14

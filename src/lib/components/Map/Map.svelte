@@ -141,18 +141,21 @@
 					setTimeout(() => {
 						const style = map.getStyle();
 						if (style?.layers) {
-							const heatRasterLayers = style.layers.filter(layer =>
-								layer.id.includes('raster-layer-') && layer.type === 'raster' && !layer.id.includes('satellite')
+							const heatRasterLayers = style.layers.filter(
+								(layer) =>
+									layer.id.includes('raster-layer-') &&
+									layer.type === 'raster' &&
+									!layer.id.includes('satellite')
 							);
 							// Find the first road/transportation layer to position heat raster layers before streets
-							const firstRoadLayer = style.layers.find(layer =>
-								layer['source-layer'] === 'transportation' && layer.type === 'line'
+							const firstRoadLayer = style.layers.find(
+								(layer) => layer['source-layer'] === 'transportation' && layer.type === 'line'
 							);
-							const buildingLayer = style.layers.find(layer => layer.id === 'building');
+							const buildingLayer = style.layers.find((layer) => layer.id === 'building');
 
 							if (heatRasterLayers.length > 0 && (firstRoadLayer || buildingLayer)) {
 								const targetLayerId = firstRoadLayer?.id || 'building';
-								heatRasterLayers.forEach(rasterLayer => {
+								heatRasterLayers.forEach((rasterLayer) => {
 									try {
 										// Move heat raster layers before first road layer (or building if no roads)
 										map.moveLayer(rasterLayer.id, targetLayerId);
@@ -220,6 +223,8 @@
 
 	function onMapLoad(map: maplibregl.Map) {
 		if (!map) return;
+		// test hook: lets e2e tests wait for the map to be idle (compiled away outside `--mode test`)
+		if (import.meta.env.MODE === 'test') window.__D2R_MAP__ = map;
 		map.zoomTo(map.getZoom() ?? 10);
 		disableMapRotation(map);
 	}

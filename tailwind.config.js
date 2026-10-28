@@ -1,4 +1,6 @@
 import layerstack from '@layerstack/tailwind/plugin';
+import typography from '@tailwindcss/typography';
+import touch from 'tailwindcss-touch';
 import { fontFamily } from 'tailwindcss/defaultTheme';
 
 /** @type {import('tailwindcss').Config} */
@@ -67,7 +69,7 @@ const config = {
 			}
 		}
 	},
-	plugins: [require('@tailwindcss/typography'), require('tailwindcss-touch')(), layerstack()]
+	plugins: [typography, touch(), layerstack()]
 };
 
 export default config;

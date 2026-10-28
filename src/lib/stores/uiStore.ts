@@ -207,7 +207,7 @@ export const updateHour = derived(hour, (prevH) => (h: number) => {
 // FORMATTED TIME CONFIGURATION
 export const formattedTimeConfiguration = derived(
 	[datavisType, rangeStartDate, rangeEndDate, dayEndDate, hour, locale, LL],
-	([datavisTypeVal, rangeStartVal, rangeEndVal, dayEndVal, hourVal, localeVal, LLVal]) => {
+	([datavisTypeVal, rangeStartVal, rangeEndVal, dayEndVal, hourVal, localeVal, _LLVal]) => {
 		if (!dayEndVal || !rangeStartVal || !rangeEndVal) return '';
 		const dateLocale = localeVal === 'de' ? de : enUS;
 
