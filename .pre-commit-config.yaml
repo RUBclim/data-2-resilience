@@ -33,7 +33,7 @@ repos:
           - tailwindcss@4.3.3
           - '@tailwindcss/typography@0.5.20'
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.13.0
+    rev: v10.14.0
     hooks:
       - id: eslint
         files: \.(js|mjs|ts|svelte)$
