@@ -12,6 +12,7 @@
 		"format": "prettier --write .",
 		"typesafe-i18n": "typesafe-i18n",
 		"build:test": "svelte-kit sync && IS_DOCKER=1 vite build --mode test && node scripts/remap-server-sourcemaps.mjs",
+		"build:test:integration": "PUBLIC_VITE_BASE_URL=http://127.0.0.1:4173 pnpm build:test",
 		"test": "pnpm test:unit && pnpm build:test && pnpm test:e2e && pnpm coverage",
 		"test:unit": "vitest run",
 		"test:e2e": "playwright test",

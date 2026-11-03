@@ -125,7 +125,7 @@ jobs:
       - name: Install dependencies
         run: scripts/docker.sh pnpm install --frozen-lockfile
       - name: Build
-        run: scripts/docker.sh pnpm build:test
+        run: scripts/docker.sh pnpm build:test:integration
       - name: Live integration test
         run: scripts/docker.sh pnpm test:integration
       - name: Upload report

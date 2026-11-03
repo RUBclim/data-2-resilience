@@ -1,10 +1,17 @@
 import { defineConfig, devices } from '@playwright/test';
-import { BASE_URL, PORT, TIMEZONE } from './tests/support/constants.mjs';
+import { PORT, TIMEZONE } from './tests/support/constants.mjs';
 
 /**
- * Live integration test (same port as the e2e suite: the test build serves its own vector tiles
- * from PUBLIC_VITE_BASE_URL=http://localhost:4173, so do not run both at the same time): the real API, raster tile server, geocoder and basemap hosts, real time.
- * Runs nightly in CI (and via `pnpm test:integration`) against the test build (`pnpm build:test`).
+ * The geocoder (geoweb1.digistadtdo.de) answers 403 to an Origin/Referer of `localhost:<port>`,
+ * so the live run uses 127.0.0.1. The vector tiles are served by the test build itself from
+ * PUBLIC_VITE_BASE_URL, which therefore has to be the same host (`pnpm build:test:integration`).
+ */
+const BASE_URL = `http://127.0.0.1:${PORT}`;
+
+/**
+ * Live integration test (same port as the e2e suite, so do not run both at the same time): the
+ * real API, raster tile server, geocoder and basemap hosts, real time.
+ * Runs nightly in CI (and via `pnpm test:integration`) against `pnpm build:test:integration`.
  */
 export default defineConfig({
 	testDir: 'tests/integration',
